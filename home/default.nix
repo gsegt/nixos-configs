@@ -1,6 +1,10 @@
 { config, ... }:
 
 {
+  imports = [
+    ./shell.nix
+  ];
+
   home.username = "gsegt";
   home.homeDirectory = "/home/${config.home.username}";
 
