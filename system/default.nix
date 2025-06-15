@@ -5,23 +5,18 @@
     ./hardware-configuration.nix
   ];
 
-  # Bootloader
   boot.loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/efi";
   };
 
-  # Bootlader conf for VM
   boot.initrd.checkJournalingFS = false;
 
-  # Hostname
   networking.hostName = "nixos";
 
-  # Time Zone
   time.timeZone = "Europe/Paris";
 
-  # Users
   users.users.gsegt = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
@@ -34,7 +29,6 @@
 
   programs.fish.enable = true;
 
-  # Emnable passwordless sudo
   security.sudo.extraRules = [
     {
       users = [ "gsegt" ];
@@ -47,25 +41,21 @@
     }
   ];
 
-  # Enable Flakes
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
   ];
 
-  # Garbage collection
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
 
-  # System packages
   environment.systemPackages = with pkgs; [
     git
   ];
 
-  # Enable ssh access
   services.openssh.enable = true;
 
   environment.sessionVariables = rec {
