@@ -5,13 +5,16 @@
     ./hardware-configuration.nix
   ];
 
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
-    efi.efiSysMountPoint = "/efi";
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/efi";
+      };
+    };
+    initrd.checkJournalingFS = false;
   };
-
-  boot.initrd.checkJournalingFS = false;
 
   networking.hostName = "nixos";
 
