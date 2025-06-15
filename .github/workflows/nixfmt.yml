@@ -1,7 +1,7 @@
 name: nixfmt
 run-name: Check nix file format
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   nixfmt:
