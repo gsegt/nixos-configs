@@ -7,6 +7,7 @@
     ./environment-variables.nix
     ./hardware-configuration.nix
     ./user.nix
+    ./zfs.nix
     ./zram.nix
   ];
 
