@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./docker.nix
     ./hardware-configuration.nix
     ./zram.nix
   ];
