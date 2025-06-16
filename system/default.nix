@@ -6,6 +6,7 @@
     ./editor.nix
     ./environment-variables.nix
     ./hardware-configuration.nix
+    ./nfs.nix
     ./remote-unlock.nix
     ./samba.nix
     ./ssh.nix
