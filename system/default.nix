@@ -10,10 +10,7 @@
   boot = {
     loader = {
       systemd-boot.enable = true;
-      efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/efi";
-      };
+      efi.canTouchEfiVariables = true;
     };
     initrd.checkJournalingFS = false;
   };
