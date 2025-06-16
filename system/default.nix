@@ -81,5 +81,10 @@
     vimAlias = true;
   };
 
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+  };
+
   system.stateVersion = "25.05";
 }
