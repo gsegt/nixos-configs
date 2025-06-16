@@ -7,6 +7,7 @@
     ./environment-variables.nix
     ./hardware-configuration.nix
     ./remote-unlock.nix
+    ./samba.nix
     ./ssh.nix
     ./upgrade-diff.nix
     ./user.nix
