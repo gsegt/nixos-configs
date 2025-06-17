@@ -3,7 +3,10 @@
 {
   imports = [
     ./docker.nix
+    ./editor.nix
+    ./environment-variables.nix
     ./hardware-configuration.nix
+    ./user.nix
     ./zram.nix
   ];
 
@@ -18,30 +21,6 @@
   networking.hostName = "nixos";
 
   time.timeZone = "Europe/Paris";
-
-  users.users.gsegt = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-    initialPassword = "changeme";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
-    ];
-    shell = pkgs.fish;
-  };
-
-  programs.fish.enable = true;
-
-  security.sudo.extraRules = [
-    {
-      users = [ "gsegt" ];
-      commands = [
-        {
-          command = "ALL";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
 
   nix.settings.experimental-features = [
     "nix-command"
@@ -61,26 +40,6 @@
   services.openssh.enable = true;
 
   services.logind.lidSwitch = "ignore";
-
-  environment.sessionVariables = rec {
-    XDG_CACHE_HOME = "$HOME/.cache";
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_DATA_HOME = "$HOME/.local/share";
-    XDG_STATE_HOME = "$HOME/.local/state";
-
-    # Not officially in the specification
-    XDG_BIN_HOME = "$HOME/.local/bin";
-    PATH = [
-      "${XDG_BIN_HOME}"
-    ];
-  };
-
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
 
   system.stateVersion = "25.05";
 }
