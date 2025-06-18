@@ -17,6 +17,10 @@
       };
       rebase = {
         autostash = "true";
+        autosquash = "true";
+      };
+      advice = {
+        skippedCherryPicks = "false";
       };
     };
   };
