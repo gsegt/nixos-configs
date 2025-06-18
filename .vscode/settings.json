@@ -1,0 +1,28 @@
+{
+    // Common
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    // Markdown
+    "markdown.occurrencesHighlight.enabled": true,
+    "markdown.validate.enabled": true,
+    "markdown.extension.tableFormatter.normalizeIndentation": true,
+    "markdownlint.config": {
+        "MD024": {
+            "siblings_only": true
+        }
+    },
+    "markdown.extension.toc.orderedList": false,
+    "markdown.extension.toc.slugifyMode": "github",
+    "[markdown]": {
+        "editor.tabSize": 4
+    },
+    //Spelling
+    "cSpell.language": "en-GB",
+}
