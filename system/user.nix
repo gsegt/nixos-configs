@@ -11,7 +11,7 @@
     shell = pkgs.fish;
   };
 
-  programs.fish.enable = true;
+  programs.fish.enable = true; # Needs to be installed system wide for user to login
 
   security.sudo.extraRules = [
     {

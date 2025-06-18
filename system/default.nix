@@ -17,7 +17,7 @@
   boot.initrd.checkJournalingFS = false;
 
   environment.systemPackages = with pkgs; [
-    git
+    git # Necessary for home manager
   ];
 
   networking.hostName = "nixos";
