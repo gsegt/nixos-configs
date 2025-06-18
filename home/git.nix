@@ -3,6 +3,7 @@
     enable = true;
     userName = "gsegt";
     userEmail = "git@gsegt.eu";
+    # Sections are to mimic the final configuration
     extraConfig = {
       core = {
         autocrlf = "input";
@@ -14,7 +15,9 @@
       pull = {
         rebase = "true";
       };
-      rebase.autostash = "true";
+      rebase = {
+        autostash = "true";
+      };
     };
   };
 }
