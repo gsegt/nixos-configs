@@ -16,9 +16,11 @@
   };
   boot.initrd.checkJournalingFS = false;
 
-  networking.hostName = "nixos";
+  environment.systemPackages = with pkgs; [
+    git
+  ];
 
-  time.timeZone = "Europe/Paris";
+  networking.hostName = "nixos";
 
   nix.settings.experimental-features = [
     "nix-command"
@@ -31,13 +33,11 @@
     options = "--delete-older-than 30d";
   };
 
-  environment.systemPackages = with pkgs; [
-    git
-  ];
-
   services.openssh.enable = true;
 
   services.logind.lidSwitch = "ignore";
+
+  time.timeZone = "Europe/Paris";
 
   system.stateVersion = "25.05";
 }
