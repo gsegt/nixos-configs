@@ -10,13 +10,11 @@
     ./zram.nix
   ];
 
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-    initrd.checkJournalingFS = false;
+  boot.loader = {
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = true;
   };
+  boot.initrd.checkJournalingFS = false;
 
   networking.hostName = "nixos";
 
