@@ -4,6 +4,7 @@
   imports = [
     ./git.nix
     ./shell.nix
+    ./upgrade-diff.nix
   ];
 
   home.username = "gsegt";
