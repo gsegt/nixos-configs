@@ -6,6 +6,7 @@
     ./editor.nix
     ./environment-variables.nix
     ./hardware-configuration.nix
+    ./remote-unlock.nix
     ./upgrade-diff.nix
     ./user.nix
     ./zfs.nix
