@@ -4,6 +4,7 @@
   imports = [
     ./git.nix
     ./shell.nix
+    ./ssh.nix
     ./upgrade-diff.nix
   ];
 
