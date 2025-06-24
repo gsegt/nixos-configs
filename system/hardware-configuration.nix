@@ -23,12 +23,18 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/b056d2e0-badb-456a-9990-015b4329375b";
+    device = "/dev/disk/by-uuid/0ed9a99b-7526-402e-a52a-675c624e1858";
     fsType = "btrfs";
+    options = [
+      "compress-force=zstd:1"
+      "noatime"
+    ];
   };
 
+  boot.initrd.luks.devices."system".device = "/dev/disk/by-uuid/f0519d44-f3b3-4402-8d8b-2bb6be44ab7c";
+
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/A31A-68C2";
+    device = "/dev/disk/by-uuid/5FD5-CB0F";
     fsType = "vfat";
     options = [
       "fmask=0077"
