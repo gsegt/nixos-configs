@@ -8,7 +8,7 @@
     ./upgrade-diff.nix
   ];
 
-  home.username = "gsegt";
+  home.username = "acer";
   home.homeDirectory = "/home/${config.home.username}";
 
   home.stateVersion = "25.05";

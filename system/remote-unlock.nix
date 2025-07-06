@@ -1,6 +1,6 @@
 {
   boot.initrd = {
-    availableKernelModules = [ "e1000" ];
+    availableKernelModules = [ "r8169" ];
     network = {
       enable = true;
       ssh = {
@@ -17,5 +17,5 @@
       '';
     };
   };
-  boot.kernelParams = [ "ip=10.0.2.16::10.0.2.255:255.255.255.0:nixos" ];
+  boot.kernelParams = [ "ip=192.168.1.252::192.168.1.254:255.255.255.0:aspire" ];
 }

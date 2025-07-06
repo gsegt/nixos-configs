@@ -18,13 +18,12 @@
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
   };
-  boot.initrd.checkJournalingFS = false;
 
   environment.systemPackages = with pkgs; [
     git # Necessary for home manager
   ];
 
-  networking.hostName = "nixos";
+  networking.hostName = "aspire";
 
   nix.settings.experimental-features = [
     "nix-command"
