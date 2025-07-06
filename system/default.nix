@@ -7,6 +7,7 @@
     ./environment-variables.nix
     ./hardware-configuration.nix
     ./remote-unlock.nix
+    ./ssh.nix
     ./upgrade-diff.nix
     ./user.nix
     ./zfs.nix
@@ -35,8 +36,6 @@
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
-
-  services.openssh.enable = true;
 
   services.logind.lidSwitch = "ignore";
 
