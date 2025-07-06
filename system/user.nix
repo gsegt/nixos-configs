@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  users.users.gsegt = {
+  users.users.acer = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     initialPassword = "changeme";
@@ -15,7 +15,7 @@
 
   security.sudo.extraRules = [
     {
-      users = [ "gsegt" ];
+      users = [ "acer" ];
       commands = [
         {
           command = "ALL";
