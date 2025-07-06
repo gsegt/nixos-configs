@@ -19,7 +19,7 @@
       ...
     }@inputs:
     {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.aspire = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           vscode-server.nixosModules.default
@@ -37,7 +37,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.gsegt = import ./home;
+            home-manager.users.acer = import ./home;
           }
         ];
       };
