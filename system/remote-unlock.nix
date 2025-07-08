@@ -9,7 +9,7 @@
         authorizedKeys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEf5Nt/JVAhptEaxDU/5Rdf284QswbVpKOOWFf7o5RAk"
         ];
-        hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+        hostKeys = [ "/opt/secrets/initrd/ssh_host_ed25519_key" ];
       };
       postCommands = ''
         # Automatically ask for the password on SSH login
