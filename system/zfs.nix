@@ -1,7 +1,7 @@
 {
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.forceImportRoot = false;
-  boot.zfs.extraPools = [ "data_vault" ];
+  boot.zfs.extraPools = [ "data-vault" ];
 
   networking.hostId = "228b6aee";
 
