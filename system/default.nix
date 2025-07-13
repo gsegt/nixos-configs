@@ -26,6 +26,10 @@
   ];
 
   networking.hostName = "aspire";
+  networking.nameservers = [
+    "1.1.1.1"
+    "1.0.0.1"
+  ];
 
   nix.settings.experimental-features = [
     "nix-command"
