@@ -6,6 +6,7 @@
     ./editor.nix
     ./environment-variables.nix
     ./hardware-configuration.nix
+    ./intel.nix
     ./nfs.nix
     ./nvidia.nix
     ./remote-unlock.nix

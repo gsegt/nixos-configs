@@ -20,7 +20,10 @@
     }@inputs:
     {
       nixosConfigurations.aspire = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        pkgs = import nixpkgs {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
         modules = [
           vscode-server.nixosModules.default
           (
