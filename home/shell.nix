@@ -16,6 +16,7 @@
       reboot = "sudo systemctl reboot";
       watch = "watch -n 1";
       snrs = "sudo nixos-rebuild switch";
+      snrb = "sudo nixos-rebuild boot";
     };
     functions = {
       bind_bang = ''
