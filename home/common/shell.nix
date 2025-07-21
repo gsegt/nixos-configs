@@ -5,6 +5,7 @@
     shellInit = ''
       set -g fish_greeting
       fish_user_key_bindings
+      fish_add_path $XDG_BIN_HOME
     '';
     shellAbbrs = {
       ls = "ls -l";
@@ -17,6 +18,7 @@
       watch = "watch -n 1";
       snrs = "sudo nixos-rebuild switch";
       snrb = "sudo nixos-rebuild boot";
+      nsp = "nix-shell -p";
     };
     functions = {
       bind_bang = ''

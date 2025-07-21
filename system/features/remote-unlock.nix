@@ -1,6 +1,8 @@
+{ hostname, remoteUnlock, ... }:
+
 {
   boot.initrd = {
-    availableKernelModules = [ "r8169" ];
+    availableKernelModules = remoteUnlock.networkKernelModules;
     network = {
       enable = true;
       ssh = {
@@ -17,5 +19,7 @@
       '';
     };
   };
-  boot.kernelParams = [ "ip=192.168.1.252::192.168.1.254:255.255.255.0:aspire" ];
+  boot.kernelParams = [
+    "ip=${remoteUnlock.ip}::${remoteUnlock.gateway}:${remoteUnlock.mask}:${hostname}"
+  ];
 }
