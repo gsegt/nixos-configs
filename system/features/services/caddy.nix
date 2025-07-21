@@ -23,6 +23,7 @@
       reverse_proxy localhost:8888
     '';
   };
+
   networking.firewall.allowedTCPPorts = [
     80
     443

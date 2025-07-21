@@ -1,3 +1,0 @@
-{
-  hardware.nvidiaOptimus.disable = true;
-}

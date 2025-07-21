@@ -1,12 +1,18 @@
 {
-  description = "NixOS configuration with flakes";
-
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05-small";
-    vscode-server.url = "github:nix-community/nixos-vscode-server";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-25.05-small";
+    home-manager-server = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-server";
     };
   };
 
@@ -14,32 +20,54 @@
     {
       self,
       nixpkgs,
-      vscode-server,
       home-manager,
+      nixos-wsl,
+      nixpkgs-server,
+      home-manager-server,
       ...
-    }@inputs:
+    }:
+    let
+      timezone = "Europe/Paris";
+      hostModule = specialArgs: ./system/hosts/${specialArgs.hostname};
+      homeManagerModule = specialArgs: {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.extraSpecialArgs = specialArgs;
+        home-manager.users.${specialArgs.username} = import ./home/hosts/${specialArgs.hostname};
+      };
+    in
     {
-      nixosConfigurations.aspire = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem rec {
         system = "x86_64-linux";
+        specialArgs = {
+          username = "gsegt";
+          hostname = "wsl";
+        };
         modules = [
-          vscode-server.nixosModules.default
-          (
-            { pkgs, ... }:
-            {
-              services.vscode-server.enable = true;
-              environment.systemPackages = with pkgs; [
-                nixfmt-rfc-style
-              ];
-            }
-          )
-          ./system
-          ./services
           home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.acer = import ./home;
-          }
+          nixos-wsl.nixosModules.wsl
+          (hostModule specialArgs)
+          (homeManagerModule specialArgs)
+        ];
+      };
+      nixosConfigurations.aspire = nixpkgs-server.lib.nixosSystem rec {
+        system = "x86_64-linux";
+        specialArgs = {
+          username = "acer";
+          hostname = "aspire";
+          timezone = timezone;
+          remoteUnlock = {
+            networkKernelModules = [ "r8169" ];
+            ip = "192.168.1.252";
+            gateway = "192.168.1.254";
+            mask = "255.255.255.0";
+          };
+          zfsExtraPools = [ "data-vault" ];
+        };
+        modules = [
+          home-manager-server.nixosModules.home-manager
+          (hostModule specialArgs)
+          (homeManagerModule specialArgs)
         ];
       };
     };
