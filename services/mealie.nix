@@ -1,15 +1,10 @@
-let
-  port = 9925;
-in
 {
   services.mealie = {
     enable = true;
-    port = port;
+    port = 9925;
     settings = {
       ALLOW_SIGNUP = "false";
       TZ = Europe/Paris;
     };
   };
-
-  networking.firewall.allowedTCPPorts = [ port ];
 }
