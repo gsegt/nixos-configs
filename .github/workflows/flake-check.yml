@@ -1,15 +1,15 @@
-name: nixfmt
-run-name: Check nix file format
+name: flake-check
+run-name: Check nix flake
 
 on: [pull_request]
 
 jobs:
-  nixfmt:
+  flake-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Install Nix
         uses: cachix/install-nix-action@v31
-      - name: Check formatting
-        run: nix run nixpkgs#nixfmt-tree -- --ci
+      - name: Check flake
+        run: nix flake check
