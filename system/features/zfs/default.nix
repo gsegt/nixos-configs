@@ -1,11 +1,14 @@
-{ zfsExtraPools, ... }:
+{ config, zfsExtraPools, ... }:
 
 {
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.forceImportRoot = false;
   boot.zfs.extraPools = zfsExtraPools;
 
-  networking.hostId = "228b6aee";
+  # Sha512 is overkill since there are no security implications but this should be very future proof
+  networking.hostId = builtins.substring 0 8 (
+    builtins.hashString "sha512" config.networking.hostName
+  );
 
   services.zfs.autoScrub.enable = true;
 
