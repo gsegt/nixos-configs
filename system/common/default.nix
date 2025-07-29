@@ -7,10 +7,10 @@
 
 {
   imports = [
-    ./common/editor.nix
-    ./common/environment-variables.nix
-    ./common/user.nix
-    ./common/zram.nix
+    ./editor
+    ./environment-variables
+    ./user
+    ./zram
   ];
 
   nix.settings.experimental-features = [

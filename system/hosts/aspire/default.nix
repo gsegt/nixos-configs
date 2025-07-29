@@ -8,18 +8,18 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../common.nix
-    ../../features/bootloader.nix
-    ../../features/dns.nix
-    ../../features/docker.nix
-    ../../features/nfs.nix
-    ../../features/remote-unlock.nix
-    ../../features/samba.nix
-    ../../features/ssh.nix
-    ../../features/timezone.nix
-    ../../features/zfs.nix
-    ../../features/services/caddy.nix
-    ../../features/services/mealie.nix
+    ../../common
+    ../../features/bootloader
+    ../../features/dns
+    ../../features/docker
+    ../../features/nfs
+    ../../features/remote-unlock
+    ../../features/samba
+    ../../features/ssh
+    ../../features/timezone
+    ../../features/zfs
+    ../../features/services/caddy
+    ../../features/services/mealie
   ];
 
   users.users.${username} = {

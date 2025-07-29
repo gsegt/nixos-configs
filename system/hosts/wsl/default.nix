@@ -1,7 +1,7 @@
 { wsl, username, ... }:
 
 {
-  imports = [ ../../common.nix ];
+  imports = [ ../../common ];
 
   wsl.enable = true;
   wsl.defaultUser = username;

@@ -2,9 +2,9 @@
 
 {
   imports = [
-    ./common/git.nix
-    ./common/shell.nix
-    ./common/ssh.nix
+    ./git
+    ./shell
+    ./ssh
   ];
 
   home.username = username;
