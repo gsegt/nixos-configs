@@ -5,7 +5,6 @@
     ./common/git.nix
     ./common/shell.nix
     ./common/ssh.nix
-    ./common/upgrade-diff.nix
   ];
 
   home.username = username;

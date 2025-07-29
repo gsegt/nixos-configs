@@ -9,7 +9,6 @@
   imports = [
     ./common/editor.nix
     ./common/environment-variables.nix
-    ./common/upgrade-diff.nix
     ./common/user.nix
     ./common/zram.nix
   ];
