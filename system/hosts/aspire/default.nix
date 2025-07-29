@@ -28,18 +28,6 @@
     initialPassword = "changeme";
   };
 
-  security.sudo.extraRules = [
-    {
-      users = [ username ];
-      commands = [
-        {
-          command = "ALL";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
-
   services.logind.lidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;
