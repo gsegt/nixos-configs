@@ -8,5 +8,7 @@
     shell = pkgs.fish;
   };
 
+  security.sudo.wheelNeedsPassword = false; # Technically redundant for wsl systems
+
   programs.fish.enable = true; # Needs to be installed system wide for user to login
 }
