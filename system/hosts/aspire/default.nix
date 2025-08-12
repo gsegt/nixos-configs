@@ -1,9 +1,4 @@
-{
-  pkgs,
-  username,
-  hostname,
-  ...
-}:
+{ config, ... }:
 
 {
   imports = [
@@ -22,7 +17,11 @@
     ../../features/services/mealie
   ];
 
-  users.users.${username} = {
+  common.enable = true;
+  common.username = "acer";
+  common.hostname = "aspire";
+
+  users.users.${config.common.username} = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     initialPassword = "changeme";
