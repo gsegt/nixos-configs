@@ -54,12 +54,6 @@
         specialArgs = {
           username = "acer";
           hostname = "aspire";
-          remoteUnlock = {
-            networkKernelModules = [ "r8169" ];
-            ip = "192.168.1.252";
-            gateway = "192.168.1.254";
-            mask = "255.255.255.0";
-          };
         };
         modules = [
           home-manager-server.nixosModules.home-manager
