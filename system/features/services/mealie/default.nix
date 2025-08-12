@@ -1,4 +1,4 @@
-{ timezone, ... }:
+{ config, ... }:
 
 {
   services.mealie = {
@@ -6,7 +6,7 @@
     port = 9925;
     settings = {
       ALLOW_SIGNUP = "false";
-      TZ = timezone;
+      TZ = config.time.timeZone;
     };
   };
 }
