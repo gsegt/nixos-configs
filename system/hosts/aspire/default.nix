@@ -4,11 +4,11 @@
   imports = [
     ./hardware-configuration.nix
     ../../common
+    ../../features/boot-remote-unlock
     ../../features/bootloader
     ../../features/dns
     ../../features/docker
     ../../features/nfs
-    ../../features/remote-unlock
     ../../features/samba
     ../../features/ssh
     ../../features/zfs
@@ -29,6 +29,14 @@
   services.logind.lidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;
+
+  boot-remote-unlock = {
+    enable = true;
+    networkKernelModules = [ "r8169" ];
+    ip = "192.168.1.252";
+    gateway = "192.168.1.254";
+    mask = "255.255.255.0";
+  };
 
   zfs.enable = true;
   zfs.extraPools = [ "data-vault" ];
