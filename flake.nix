@@ -62,7 +62,6 @@
             gateway = "192.168.1.254";
             mask = "255.255.255.0";
           };
-          zfsExtraPools = [ "data-vault" ];
         };
         modules = [
           home-manager-server.nixosModules.home-manager
