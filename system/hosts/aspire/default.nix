@@ -30,4 +30,7 @@
   services.logind.lidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;
+
+  zfs.enable = true;
+  zfs.extraPools = [ "data-vault" ];
 }
