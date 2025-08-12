@@ -11,7 +11,6 @@
     ../../features/remote-unlock
     ../../features/samba
     ../../features/ssh
-    ../../features/timezone
     ../../features/zfs
     ../../features/services/caddy
     ../../features/services/mealie

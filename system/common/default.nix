@@ -19,6 +19,11 @@ in
       type = lib.types.str;
       description = "Hostname of the current system";
     };
+    timeZone = lib.mkOption {
+      type = lib.types.str;
+      default = "Europe/Paris";
+      description = "Timezone of the current system";
+    };
   };
 
   imports = [
@@ -34,6 +39,8 @@ in
       git # Necessary for home manager
       nixfmt-rfc-style # For formatting Nix files
     ];
+
+    time.timeZone = cfg.timeZone;
 
     networking.hostName = cfg.hostname;
 

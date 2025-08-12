@@ -27,7 +27,6 @@
       ...
     }:
     let
-      timezone = "Europe/Paris";
       hostModule = specialArgs: ./system/hosts/${specialArgs.hostname};
       homeManagerModule = specialArgs: {
         home-manager.useGlobalPkgs = true;
@@ -55,7 +54,6 @@
         specialArgs = {
           username = "acer";
           hostname = "aspire";
-          timezone = timezone;
           remoteUnlock = {
             networkKernelModules = [ "r8169" ];
             ip = "192.168.1.252";
