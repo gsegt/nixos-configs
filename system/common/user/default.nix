@@ -1,14 +1,28 @@
-{ pkgs, username, ... }:
-
 {
-  users.users.${username} = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
-    ];
-    shell = pkgs.fish;
+  lib,
+  config,
+  pkgs,
+  ...
+}:
+
+let
+  cfg = config.common.user;
+in
+{
+  options.common.user = {
+    enable = lib.mkEnableOption "Enable common user settings for all systems";
   };
 
-  security.sudo.wheelNeedsPassword = false; # Technically redundant for wsl systems
+  config = lib.mkIf cfg.enable {
+    users.users.${config.common.username} = {
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
+      ];
+      shell = pkgs.fish;
+    };
 
-  programs.fish.enable = true; # Needs to be installed system wide for user to login
+    security.sudo.wheelNeedsPassword = false; # Technically redundant for wsl systems
+
+    programs.fish.enable = true; # Needs to be installed system wide for user to login
+  };
 }
