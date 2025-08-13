@@ -4,10 +4,19 @@
   pkgs,
   ...
 }:
+
 let
   cfg = config.common;
 in
 {
+  imports = [
+    ./editor
+    ./environment-variables
+    ./nix
+    ./user
+    ./zram
+  ];
+
   options.common = {
     enable = lib.mkEnableOption "Enable common settings for all systems";
     username = lib.mkOption {
@@ -25,14 +34,6 @@ in
       description = "Timezone of the current system";
     };
   };
-
-  imports = [
-    ./editor
-    ./environment-variables
-    ./nix
-    ./user
-    ./zram
-  ];
 
   config = lib.mkIf cfg.enable {
     common.editor.enable = true;
