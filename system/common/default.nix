@@ -35,6 +35,8 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+    common.zram.enable = true;
+
     environment.systemPackages = with pkgs; [
       git # Necessary for home manager
       nixfmt-rfc-style # For formatting Nix files
