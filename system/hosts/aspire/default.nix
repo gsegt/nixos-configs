@@ -8,7 +8,6 @@
     ../../features/bootloader
     ../../features/containerisation
     ../../features/dns
-    ../../features/samba
     ../../features/ssh
     ../../features/zfs
     ../../features/services/caddy
