@@ -3,15 +3,15 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../common
-    ../../features/boot-remote-unlock
-    ../../features/bootloader
-    ../../features/containerisation
-    ../../features/dns
-    ../../features/mealie
-    ../../features/reverse-proxy
-    ../../features/ssh
-    ../../features/zfs
+    ../../system/common
+    ../../system/features/boot-remote-unlock
+    ../../system/features/bootloader
+    ../../system/features/containerisation
+    ../../system/features/dns
+    ../../system/features/mealie
+    ../../system/features/reverse-proxy
+    ../../system/features/ssh
+    ../../system/features/zfs
   ];
 
   common.enable = true;

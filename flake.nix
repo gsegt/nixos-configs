@@ -27,12 +27,12 @@
       ...
     }:
     let
-      hostModule = specialArgs: ./system/hosts/${specialArgs.hostname};
+      hostModule = specialArgs: ./hosts/${specialArgs.hostname};
       homeManagerModule = specialArgs: {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.extraSpecialArgs = specialArgs;
-        home-manager.users.${specialArgs.username} = import ./home/hosts/${specialArgs.hostname};
+        home-manager.users.${specialArgs.username} = import ./hosts/${specialArgs.hostname}/home.nix;
       };
     in
     {

@@ -1,7 +1,7 @@
 { config, wsl, ... }:
 
 {
-  imports = [ ../../common ];
+  imports = [ ../../system/common ];
   common.enable = true;
   common.username = "gsegt";
   common.hostname = "wsl";
