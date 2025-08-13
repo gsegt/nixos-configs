@@ -28,12 +28,6 @@
     }:
     let
       hostModule = specialArgs: ./hosts/${specialArgs.hostname};
-      homeManagerModule = specialArgs: {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.extraSpecialArgs = specialArgs;
-        home-manager.users.${specialArgs.username} = import ./hosts/${specialArgs.hostname}/home.nix;
-      };
     in
     {
       nixosConfigurations.wsl = nixpkgs.lib.nixosSystem rec {
@@ -46,7 +40,6 @@
           home-manager.nixosModules.home-manager
           nixos-wsl.nixosModules.wsl
           (hostModule specialArgs)
-          (homeManagerModule specialArgs)
         ];
       };
       nixosConfigurations.aspire = nixpkgs-server.lib.nixosSystem rec {
@@ -58,7 +51,6 @@
         modules = [
           home-manager-server.nixosModules.home-manager
           (hostModule specialArgs)
-          (homeManagerModule specialArgs)
         ];
       };
     };

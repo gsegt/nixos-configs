@@ -12,6 +12,7 @@ in
   imports = [
     ./editor
     ./environment-variables
+    ./home-manager
     ./nix
     ./user
     ./zram
@@ -39,6 +40,8 @@ in
     system.common.editor.enable = true;
 
     system.common.environment-variables.enable = true;
+
+    system.common.home-manager.enable = true;
 
     system.common.nix.enable = true;
 
