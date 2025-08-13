@@ -35,6 +35,8 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+    common.user.enable = true;
+
     common.zram.enable = true;
 
     environment.systemPackages = with pkgs; [
