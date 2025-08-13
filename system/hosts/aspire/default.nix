@@ -38,6 +38,8 @@
     mask = "255.255.255.0";
   };
 
+  bootloader.enable = true;
+
   zfs.enable = true;
   zfs.extraPools = [ "data-vault" ];
 }
