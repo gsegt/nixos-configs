@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.common.environment-variables;
+  cfg = config.system.common.environment-variables;
 in
 {
-  options.common.environment-variables = {
+  options.system.common.environment-variables = {
     enable = lib.mkEnableOption "Enable common environment-variables settings for all systems";
   };
 

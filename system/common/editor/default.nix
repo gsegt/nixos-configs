@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.common.editor;
+  cfg = config.system.common.editor;
 in
 {
-  options.common.editor = {
+  options.system.common.editor = {
     enable = lib.mkEnableOption "Enable common editor settings for all systems";
   };
 

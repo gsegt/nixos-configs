@@ -6,7 +6,7 @@
 }:
 
 let
-  cfg = config.common;
+  cfg = config.system.common;
 in
 {
   imports = [
@@ -17,7 +17,7 @@ in
     ./zram
   ];
 
-  options.common = {
+  options.system.common = {
     enable = lib.mkEnableOption "Enable common settings for all systems";
     username = lib.mkOption {
       type = lib.types.str;
@@ -36,15 +36,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    common.editor.enable = true;
+    system.common.editor.enable = true;
 
-    common.environment-variables.enable = true;
+    system.common.environment-variables.enable = true;
 
-    common.nix.enable = true;
+    system.common.nix.enable = true;
 
-    common.user.enable = true;
+    system.common.user.enable = true;
 
-    common.zram.enable = true;
+    system.common.zram.enable = true;
 
     environment.systemPackages = with pkgs; [
       git # Necessary for home manager

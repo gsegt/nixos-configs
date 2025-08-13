@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.common.nix;
+  cfg = config.system.common.nix;
 in
 {
-  options.common.nix = {
+  options.system.common.nix = {
     enable = lib.mkEnableOption "Enable common nix settings for all systems";
   };
 

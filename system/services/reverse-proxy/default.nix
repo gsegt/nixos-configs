@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.reverse-proxy;
+  cfg = config.system.services.reverse-proxy;
 in
 {
-  options.reverse-proxy = {
+  options.system.services.reverse-proxy = {
     enable = lib.mkEnableOption "Enable custom reverse-proxy settings.";
   };
 

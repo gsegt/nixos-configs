@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.dns;
+  cfg = config.system.dns;
 in
 {
-  options.dns = {
+  options.system.dns = {
     enable = lib.mkEnableOption "Enable custom dns settings.";
   };
 

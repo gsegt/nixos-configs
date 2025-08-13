@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.bootloader;
+  cfg = config.system.bootloader;
 in
 {
-  options.bootloader = {
+  options.system.bootloader = {
     enable = lib.mkEnableOption "Enable custom bootloader settings.";
   };
 

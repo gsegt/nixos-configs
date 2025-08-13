@@ -1,11 +1,12 @@
 { config, wsl, ... }:
 
 {
-  imports = [ ../../system/common ];
-  common.enable = true;
-  common.username = "gsegt";
-  common.hostname = "wsl";
+  imports = [ ../../system ];
+
+  system.common.enable = true;
+  system.common.username = "gsegt";
+  system.common.hostname = "wsl";
 
   wsl.enable = true;
-  wsl.defaultUser = config.common.username;
+  wsl.defaultUser = config.system.common.username;
 }

@@ -6,15 +6,15 @@
 }:
 
 let
-  cfg = config.common.user;
+  cfg = config.system.common.user;
 in
 {
-  options.common.user = {
+  options.system.common.user = {
     enable = lib.mkEnableOption "Enable common user settings for all systems";
   };
 
   config = lib.mkIf cfg.enable {
-    users.users.${config.common.username} = {
+    users.users.${config.system.common.username} = {
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
       ];

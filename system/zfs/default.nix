@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.zfs;
+  cfg = config.system.zfs;
 in
 {
-  options.zfs = {
+  options.system.zfs = {
     enable = lib.mkEnableOption "Enable custom ZFS module";
     extraPools = lib.mkOption {
       type = lib.types.listOf lib.types.str;

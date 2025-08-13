@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.boot-remote-unlock;
+  cfg = config.system.boot-remote-unlock;
 in
 {
-  options.boot-remote-unlock = {
+  options.system.boot-remote-unlock = {
     enable = lib.mkEnableOption "Enable remote unlocking of encrypted devices.";
 
     ip = lib.mkOption {

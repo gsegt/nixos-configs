@@ -3,22 +3,14 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../system/common
-    ../../system/features/boot-remote-unlock
-    ../../system/features/bootloader
-    ../../system/features/containerisation
-    ../../system/features/dns
-    ../../system/features/mealie
-    ../../system/features/reverse-proxy
-    ../../system/features/ssh
-    ../../system/features/zfs
+    ../../system
   ];
 
-  common.enable = true;
-  common.username = "acer";
-  common.hostname = "aspire";
+  system.common.enable = true;
+  system.common.username = "acer";
+  system.common.hostname = "aspire";
 
-  users.users.${config.common.username} = {
+  users.users.${config.system.common.username} = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     initialPassword = "changeme";
@@ -28,7 +20,7 @@
 
   hardware.nvidiaOptimus.disable = true;
 
-  boot-remote-unlock = {
+  system.boot-remote-unlock = {
     enable = true;
     networkKernelModules = [ "r8169" ];
     ip = "192.168.1.252";
@@ -36,18 +28,18 @@
     mask = "255.255.255.0";
   };
 
-  bootloader.enable = true;
+  system.bootloader.enable = true;
 
-  containerisation.enable = true;
+  system.containerisation.enable = true;
 
-  dns.enable = true;
+  system.dns.enable = true;
 
-  mealie.enable = true;
+  system.services.mealie.enable = true;
 
-  reverse-proxy.enable = true;
+  system.services.reverse-proxy.enable = true;
 
-  ssh.enable = true;
+  system.ssh.enable = true;
 
-  zfs.enable = true;
-  zfs.extraPools = [ "data-vault" ];
+  system.zfs.enable = true;
+  system.zfs.extraPools = [ "data-vault" ];
 }

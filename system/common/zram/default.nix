@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.common.zram;
+  cfg = config.system.common.zram;
 in
 {
-  options.common.zram = {
+  options.system.common.zram = {
     enable = lib.mkEnableOption "Enable common zRAM settings for all systems";
 
   };
