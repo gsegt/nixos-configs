@@ -36,5 +36,10 @@ in
         StandardInput = "tty-force";
       };
     };
+
+    # Ensure nfs support for shared pools
+    networking.firewall.allowedTCPPorts = [ 2049 ];
+
+    services.nfs.server.enable = true;
   };
 }
