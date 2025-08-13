@@ -9,10 +9,9 @@
     ../../features/containerisation
     ../../features/dns
     ../../features/mealie
+    ../../features/reverse-proxy
     ../../features/ssh
     ../../features/zfs
-    ../../features/services/caddy
-
   ];
 
   common.enable = true;
@@ -44,6 +43,8 @@
   dns.enable = true;
 
   mealie.enable = true;
+
+  reverse-proxy.enable = true;
 
   ssh.enable = true;
 
