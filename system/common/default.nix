@@ -35,6 +35,8 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+    common.editor.enable = true;
+
     common.environment-variables.enable = true;
 
     common.nix.enable = true;
