@@ -40,6 +40,8 @@
 
   bootloader.enable = true;
 
+  dns.enable = true;
+
   zfs.enable = true;
   zfs.extraPools = [ "data-vault" ];
 }
