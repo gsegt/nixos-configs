@@ -1,17 +1,31 @@
 {
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  lib,
+  config,
+  ...
+}:
 
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
+let
+  cfg = config.common.nix;
+in
+{
+  options.common.nix = {
+    enable = lib.mkEnableOption "Enable common nix settings for all systems";
   };
 
-  nix.optimise.automatic = true;
+  config = lib.mkIf cfg.enable {
+    nix.settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
 
-  programs.nix-ld.enable = true; # Allow unpatched dynamic binaries, like VSCode remote
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
 
+    nix.optimise.automatic = true;
+
+    programs.nix-ld.enable = true; # Allow unpatched dynamic binaries, like VSCode remote
+  };
 }
