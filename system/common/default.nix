@@ -35,6 +35,8 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+    common.nix.enable = true;
+
     common.user.enable = true;
 
     common.zram.enable = true;
