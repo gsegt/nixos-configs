@@ -8,10 +8,11 @@
     ../../features/bootloader
     ../../features/containerisation
     ../../features/dns
+    ../../features/mealie
     ../../features/ssh
     ../../features/zfs
     ../../features/services/caddy
-    ../../features/services/mealie
+
   ];
 
   common.enable = true;
@@ -41,6 +42,8 @@
   containerisation.enable = true;
 
   dns.enable = true;
+
+  mealie.enable = true;
 
   ssh.enable = true;
 
