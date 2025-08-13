@@ -1,9 +1,24 @@
 {
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    settings.PermitRootLogin = "no";
+  lib,
+  config,
+  ...
+}:
+
+let
+  cfg = config.ssh;
+in
+{
+  options.ssh = {
+    enable = lib.mkEnableOption "Enable custom ssh settings.";
   };
 
-  services.fail2ban.enable = true;
+  config = lib.mkIf cfg.enable {
+    services.openssh = {
+      enable = true;
+      settings.PasswordAuthentication = false;
+      settings.PermitRootLogin = "no";
+    };
+
+    services.fail2ban.enable = true;
+  };
 }

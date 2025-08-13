@@ -42,6 +42,8 @@
 
   dns.enable = true;
 
+  ssh.enable = true;
+
   zfs.enable = true;
   zfs.extraPools = [ "data-vault" ];
 }
