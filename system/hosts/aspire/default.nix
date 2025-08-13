@@ -6,8 +6,8 @@
     ../../common
     ../../features/boot-remote-unlock
     ../../features/bootloader
+    ../../features/containerisation
     ../../features/dns
-    ../../features/docker
     ../../features/nfs
     ../../features/samba
     ../../features/ssh
@@ -39,6 +39,8 @@
   };
 
   bootloader.enable = true;
+
+  containerisation.enable = true;
 
   dns.enable = true;
 
