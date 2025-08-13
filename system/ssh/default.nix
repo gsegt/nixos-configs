@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.ssh;
+  cfg = config.system.ssh;
 in
 {
-  options.ssh = {
+  options.system.ssh = {
     enable = lib.mkEnableOption "Enable custom ssh settings.";
   };
 

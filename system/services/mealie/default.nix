@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.mealie;
+  cfg = config.system.services.mealie;
 in
 {
-  options.mealie = {
+  options.system.services.mealie = {
     enable = lib.mkEnableOption "Whether to enable custom Mealie settings.";
     port = lib.mkOption {
       type = lib.types.port;
