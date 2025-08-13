@@ -15,6 +15,10 @@ in
       default = 9000;
       description = "Port on which to serve the Mealie service.";
     };
+    url = lib.mkOption {
+      type = lib.types.str;
+      default = "mealie.gsegt.eu";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -26,5 +30,9 @@ in
         TZ = config.time.timeZone;
       };
     };
+
+    services.caddy.virtualHosts."${cfg.url}".extraConfig = ''
+      reverse_proxy localhost:${toString cfg.port}
+    '';
   };
 }
