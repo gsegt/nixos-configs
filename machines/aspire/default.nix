@@ -40,12 +40,6 @@
     extraPools = [ "data-vault" ];
   };
 
-  users.users.${config.modules.base.userName} = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-    initialPassword = "changeme";
-  };
-
   services.logind.lidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;

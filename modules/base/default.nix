@@ -39,7 +39,6 @@ in
       environment-variables.enable = true;
       home-manager.enable = true;
       nix.enable = true;
-      user.enable = true;
       zram.enable = true;
     };
 
