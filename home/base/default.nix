@@ -1,4 +1,4 @@
-{ config, username, ... }:
+{ config, userName, ... }:
 
 let
   utils = import ../../utils;
@@ -6,8 +6,8 @@ in
 {
   imports = utils.importSubmodules { dir = ./.; };
 
-  home.username = username;
-  home.homeDirectory = "/home/${username}";
+  home.username = userName;
+  home.homeDirectory = "/home/${userName}";
 
   home.stateVersion = "25.05";
 }

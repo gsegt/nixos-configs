@@ -1,8 +1,4 @@
-{
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 
 let
   cfg = config.modules.services.mealie;
@@ -10,11 +6,13 @@ in
 {
   options.modules.services.mealie = {
     enable = lib.mkEnableOption "Whether to enable custom Mealie settings.";
+
     port = lib.mkOption {
       type = lib.types.port;
       default = 9000;
       description = "Port on which to serve the Mealie service.";
     };
+
     url = lib.mkOption {
       type = lib.types.str;
       default = "mealie.gsegt.eu";

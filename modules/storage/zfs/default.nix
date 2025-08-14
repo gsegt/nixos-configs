@@ -6,6 +6,7 @@ in
 {
   options.modules.storage.zfs = {
     enable = lib.mkEnableOption "Enable custom ZFS module";
+
     extraPools = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -14,9 +15,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    boot.supportedFilesystems = [ "zfs" ];
-    boot.zfs.forceImportRoot = false;
-    boot.zfs.extraPools = cfg.extraPools;
+    boot = {
+      supportedFilesystems = [ "zfs" ];
+      zfs.forceImportRoot = false;
+      zfs.extraPools = cfg.extraPools;
+    };
 
     networking.hostId = builtins.substring 0 8 (
       builtins.hashString "sha512" config.networking.hostName

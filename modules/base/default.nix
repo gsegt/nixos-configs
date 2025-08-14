@@ -14,15 +14,18 @@ in
 
   options.modules.base = {
     enable = lib.mkEnableOption "Enable common settings for all systems";
-    username = lib.mkOption {
+
+    userName = lib.mkOption {
       type = lib.types.str;
       default = "gsegt";
       description = "Username of the primary user";
     };
-    hostname = lib.mkOption {
+
+    hostName = lib.mkOption {
       type = lib.types.str;
       description = "Hostname of the current system";
     };
+
     timeZone = lib.mkOption {
       type = lib.types.str;
       default = "Europe/Paris";
@@ -31,17 +34,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    modules.base.editor.enable = true;
-
-    modules.base.environment-variables.enable = true;
-
-    modules.base.home-manager.enable = true;
-
-    modules.base.nix.enable = true;
-
-    modules.base.user.enable = true;
-
-    modules.base.zram.enable = true;
+    modules.base = {
+      editor.enable = true;
+      environment-variables.enable = true;
+      home-manager.enable = true;
+      nix.enable = true;
+      user.enable = true;
+      zram.enable = true;
+    };
 
     environment.systemPackages = with pkgs; [
       git # Necessary for home manager
@@ -50,7 +50,7 @@ in
 
     time.timeZone = cfg.timeZone;
 
-    networking.hostName = cfg.hostname;
+    networking.hostName = cfg.hostName;
 
     system.stateVersion = "25.05";
   };

@@ -1,3 +1,1 @@
-{
-  importSubmodules = import ./importSubmodules.nix;
-}
+{ importSubmodules = import ./importSubmodules.nix; }

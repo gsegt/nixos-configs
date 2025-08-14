@@ -50,8 +50,6 @@ in
       };
     };
 
-    boot.kernelParams = [
-      "ip=${cfg.ip}::${cfg.gateway}:${cfg.mask}:${config.networking.hostName}"
-    ];
+    boot.kernelParams = [ "ip=${cfg.ip}::${cfg.gateway}:${cfg.mask}:${config.networking.hostName}" ];
   };
 }
