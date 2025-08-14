@@ -1,9 +1,16 @@
-# Nixfiles
+# NixOS configs
 
-Nixfiles for all my systems.
+NixOS configurations for all my systems.
 
-- [Nixfiles](#nixfiles)
-  - [1. Design](#1-design)
+- [NixOS configs](#nixos-configs)
+  - [1. Repository Architecture Overview](#1-repository-architecture-overview)
+    - [1.1 Key Components](#11-key-components)
+      - [1.1.1 Flake Entrypoint (`flake.nix`)](#111-flake-entrypoint-flakenix)
+      - [1.1.2. Machines (`machines/`)](#112-machines-machines)
+      - [1.1.3. Modules (`modules/`)](#113-modules-modules)
+      - [1.1.4. Users (`users/`)](#114-users-users)
+      - [1.1.5. Utils (`utils/`)](#115-utils-utils)
+    - [1.2. How It Works](#12-how-it-works)
   - [2. Install](#2-install)
     - [2.1. Baremetal machine](#21-baremetal-machine)
       - [2.1.1. Set a password for ssh access (optional)](#211-set-a-password-for-ssh-access-optional)
@@ -26,7 +33,51 @@ Nixfiles for all my systems.
       - [2.2.3. Install the system](#223-install-the-system)
       - [2.2.3. Post Install](#223-post-install)
 
-## 1. Design
+## 1. Repository Architecture Overview
+
+This NixOS configuration repository is organized to support modular, maintainable, and scalable system and user configurations using Nix flakes and home-manager.
+
+### 1.1 Key Components
+
+#### 1.1.1 Flake Entrypoint (`flake.nix`)
+
+- Defines inputs for NixOS, home-manager, and related channels.
+- Specifies all system configurations (e.g. `aspire` and `wsl` at the time of writing).
+- Each system pulls in its respective machine configuration and home-manager integration.
+
+#### 1.1.2. Machines (`machines/`)
+
+- Contains per-host configuration folders (e.g., `aspire`, `wsl`).
+- Each folder includes:
+  - `default.nix`: Main system configuration for the host.
+  - `hardware-configuration.nix`: Hardware-specific settings (for physical machines).
+
+#### 1.1.3. Modules (`modules/`)
+
+- Houses reusable NixOS modules, organized by category:
+  - `base/`: Core system settings (e.g., editor, environment variables, home-manager integration).
+  - `boot/`, `containers/`, `networking/`, `services/`, `storage/`: Service and system modules, often with further submodules.
+- Each module is typically imported into machine configs for composability.
+
+#### 1.1.4. Users (`users/`)
+
+- Per-user configuration folders (e.g., `gsegt`).
+- Each user folder contains:
+  - `default.nix`: Main home-manager configuration for the user.
+  - Subfolders (e.g., `git/`, `shell/`, `ssh/`): Home-manager modules for user-specific settings and packages.
+- User modules are automatically imported using utility functions.
+
+#### 1.1.5. Utils (`utils/`)
+
+- Utility functions for module management.
+- Example: `importSubmodules.nix` automates importing all submodules in a directory.
+
+### 1.2. How It Works
+
+- **System Configuration:** Each machine (`aspire`, `wsl`) is defined in `flake.nix` and references its folder in `machines/`. These configs import relevant modules from `modules/`.
+- **User Configuration:** Home-manager is integrated via modules and per-user configs in `users/`. User modules are auto-imported for convenience.
+- **Modularity:** New features or services can be added by creating new modules in `modules/` or user modules in `users/<user>/`.
+- **Reproducibility:** The flake structure ensures reproducible builds and easy upgrades.
 
 ## 2. Install
 
