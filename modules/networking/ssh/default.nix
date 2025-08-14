@@ -6,6 +6,12 @@ in
 {
   options.modules.networking.ssh = {
     enable = lib.mkEnableOption "Enable custom ssh settings.";
+
+    ignoreIP = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of IP addresses to never ban after failed login attempts.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -15,6 +21,9 @@ in
       settings.PermitRootLogin = "no";
     };
 
-    services.fail2ban.enable = true;
+    services.fail2ban = {
+      enable = true;
+      ignoreIP = cfg.ignoreIP;
+    };
   };
 }
