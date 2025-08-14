@@ -3,10 +3,14 @@
 {
   imports = [ ../../modules ];
 
-  modules.base.enable = true;
-  modules.base.username = "gsegt";
-  modules.base.hostname = "wsl";
+  modules.base = {
+    enable = true;
+    userName = "gsegt";
+    hostName = "wsl";
+  };
 
-  wsl.enable = true;
-  wsl.defaultUser = config.modules.base.username;
+  wsl = {
+    enable = true;
+    defaultUser = config.modules.base.userName;
+  };
 }

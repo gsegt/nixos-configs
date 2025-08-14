@@ -6,32 +6,41 @@
     ../../modules
   ];
 
-  modules.base.enable = true;
-  modules.base.username = "acer";
-  modules.base.hostname = "aspire";
-
-  modules.boot.bootloader.enable = true;
-
-  modules.boot.remote-unlock = {
+  modules.base = {
     enable = true;
-    networkKernelModules = [ "r8169" ];
-    ip = "192.168.1.252";
-    gateway = "192.168.1.254";
-    mask = "255.255.255.0";
+    userName = "acer";
+    hostName = "aspire";
+  };
+
+  modules.boot = {
+    bootloader.enable = true;
+    remote-unlock = {
+      enable = true;
+      networkKernelModules = [ "r8169" ];
+      ip = "192.168.1.252";
+      gateway = "192.168.1.254";
+      mask = "255.255.255.0";
+    };
   };
 
   modules.containers.enable = true;
 
-  modules.networking.dns.enable = true;
-  modules.networking.ssh.enable = true;
+  modules.networking = {
+    dns.enable = true;
+    ssh.enable = true;
+  };
 
-  modules.services.mealie.enable = true;
-  modules.services.reverse-proxy.enable = true;
+  modules.services = {
+    mealie.enable = true;
+    reverse-proxy.enable = true;
+  };
 
-  modules.storage.zfs.enable = true;
-  modules.storage.zfs.extraPools = [ "data-vault" ];
+  modules.storage.zfs = {
+    enable = true;
+    extraPools = [ "data-vault" ];
+  };
 
-  users.users.${config.modules.base.username} = {
+  users.users.${config.modules.base.userName} = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     initialPassword = "changeme";

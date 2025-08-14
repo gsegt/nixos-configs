@@ -14,12 +14,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.useGlobalPkgs = true;
-    home-manager.useUserPackages = true;
-    home-manager.extraSpecialArgs = {
-      username = config.modules.base.username;
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      extraSpecialArgs = {
+        userName = config.modules.base.userName;
+      };
+      users.${config.modules.base.userName} =
+        import ../../../machines/${config.modules.base.hostName}/home.nix;
     };
-    home-manager.users.${config.modules.base.username} =
-      import ../../../machines/${config.modules.base.hostname}/home.nix;
   };
 }
