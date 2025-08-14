@@ -17,7 +17,6 @@ in
 
     userName = lib.mkOption {
       type = lib.types.str;
-      default = "gsegt";
       description = "Username of the primary user";
     };
 

@@ -15,14 +15,26 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    users.users.${config.modules.base.userName} = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" ];
-      initialPassword = "changeme";
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
-      ];
-      shell = pkgs.fish;
+    users = {
+      users.${config.modules.base.userName} = {
+        isNormalUser = true;
+        uid = 1000;
+        group = config.modules.base.userName;
+        extraGroups = [
+          "users"
+          "wheel"
+        ];
+        initialPassword = "changeme";
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
+        ];
+        shell = pkgs.fish;
+      };
+      groups = {
+        ${config.modules.base.userName} = {
+          gid = 1000;
+        };
+      };
     };
 
     security.sudo.wheelNeedsPassword = false;
