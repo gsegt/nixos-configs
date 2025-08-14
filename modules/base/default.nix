@@ -6,17 +6,11 @@
 }:
 
 let
+  utils = import ../../utils;
   cfg = config.modules.base;
 in
 {
-  imports =
-    let
-      thisDir = ./.;
-      folders = builtins.filter (name: builtins.pathExists (thisDir + "/${name}/default.nix")) (
-        builtins.attrNames (builtins.readDir thisDir)
-      );
-    in
-    map (name: thisDir + "/${name}") folders;
+  imports = utils.importSubmodules { dir = ./.; };
 
   options.modules.base = {
     enable = lib.mkEnableOption "Enable common settings for all systems";
