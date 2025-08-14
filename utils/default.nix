@@ -1,0 +1,3 @@
+{
+  importSubmodules = import ./importSubmodules.nix;
+}
