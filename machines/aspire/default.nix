@@ -27,7 +27,10 @@
 
   modules.networking = {
     dns.enable = true;
-    ssh.enable = true;
+    ssh = {
+      enable = true;
+      ignoreIP = [ "192.168.1.0/24" ];
+    };
   };
 
   modules.services = {
