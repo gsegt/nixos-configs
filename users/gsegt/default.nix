@@ -1,4 +1,4 @@
-{ config, userName, ... }:
+{ userName, ... }:
 
 let
   utils = import ../../utils;

@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   home-manager,
   ...
 }:
@@ -14,14 +15,27 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.${config.modules.base.userName} = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+      initialPassword = "changeme";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
+      ];
+      shell = pkgs.fish;
+    };
+
+    security.sudo.wheelNeedsPassword = false;
+
+    programs.fish.enable = true; # Needs to be installed system wide for user to login
+
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
       extraSpecialArgs = {
         userName = config.modules.base.userName;
       };
-      users.${config.modules.base.userName} =
-        import ../../../machines/${config.modules.base.hostName}/home.nix;
+      users.${config.modules.base.userName} = import ../../../users/${config.modules.base.userName};
     };
   };
 }
