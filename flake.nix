@@ -26,31 +26,20 @@
       home-manager-server,
       ...
     }:
-    let
-      hostModule = specialArgs: ./hosts/${specialArgs.hostname};
-    in
     {
-      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem rec {
+      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {
-          username = "gsegt";
-          hostname = "wsl";
-        };
         modules = [
           home-manager.nixosModules.home-manager
           nixos-wsl.nixosModules.wsl
-          (hostModule specialArgs)
+          ./machines/wsl
         ];
       };
-      nixosConfigurations.aspire = nixpkgs-server.lib.nixosSystem rec {
+      nixosConfigurations.aspire = nixpkgs-server.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {
-          username = "acer";
-          hostname = "aspire";
-        };
         modules = [
           home-manager-server.nixosModules.home-manager
-          (hostModule specialArgs)
+          ./machines/aspire
         ];
       };
     };
