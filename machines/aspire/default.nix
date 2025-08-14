@@ -8,7 +8,7 @@
 
   modules.base = {
     enable = true;
-    userName = "acer";
+    userName = "gsegt";
     hostName = "aspire";
   };
 
