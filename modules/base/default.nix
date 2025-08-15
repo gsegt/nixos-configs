@@ -13,22 +13,22 @@ in
   imports = utils.importSubmodules { dir = ./.; };
 
   options.modules.base = {
-    enable = lib.mkEnableOption "Enable common settings for all systems";
+    enable = lib.mkEnableOption "Whether to enable custom baseline settings.";
 
     userName = lib.mkOption {
       type = lib.types.str;
-      description = "Username of the primary user";
+      description = "Username of the primary user.";
     };
 
     hostName = lib.mkOption {
       type = lib.types.str;
-      description = "Hostname of the current system";
+      description = "Hostname of the current system.";
     };
 
     timeZone = lib.mkOption {
       type = lib.types.str;
       default = "Europe/Paris";
-      description = "Timezone of the current system";
+      description = "Timezone of the current system.";
     };
   };
 

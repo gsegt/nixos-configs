@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.networking.ssh = {
-    enable = lib.mkEnableOption "Enable custom ssh settings.";
+    enable = lib.mkEnableOption "Whether to enable custom SSH settings.";
 
     ignoreIP = lib.mkOption {
       type = lib.types.listOf lib.types.str;

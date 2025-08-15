@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.containers = {
-    enable = lib.mkEnableOption "Enable custom containerisation settings.";
+    enable = lib.mkEnableOption "Whether to enable custom containers settings.";
   };
 
   config = lib.mkIf cfg.enable {

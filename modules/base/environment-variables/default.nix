@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.base.environment-variables = {
-    enable = lib.mkEnableOption "Enable common environment-variables settings for all systems";
+    enable = lib.mkEnableOption "Whether to enable custom environment variables settings.";
   };
 
   config = lib.mkIf cfg.enable {

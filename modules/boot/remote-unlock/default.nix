@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.boot.remote-unlock = {
-    enable = lib.mkEnableOption "Enable remote unlocking of encrypted devices.";
+    enable = lib.mkEnableOption "Whether to enable custom settings for remote unlock of encrypted devices.";
 
     ip = lib.mkOption {
       type = lib.types.str;
