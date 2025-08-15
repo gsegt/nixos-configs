@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.base.zram = {
-    enable = lib.mkEnableOption "Enable common zRAM settings for all systems";
+    enable = lib.mkEnableOption "Whether to enable common zRAM settings.";
 
   };
   config = lib.mkIf cfg.enable {

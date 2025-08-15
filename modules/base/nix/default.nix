@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.base.nix = {
-    enable = lib.mkEnableOption "Enable common nix settings for all systems";
+    enable = lib.mkEnableOption "Whether to enable custom nix settings.";
   };
 
   config = lib.mkIf cfg.enable {

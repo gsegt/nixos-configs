@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.boot.bootloader = {
-    enable = lib.mkEnableOption "Enable custom bootloader settings.";
+    enable = lib.mkEnableOption "Whether to enable custom bootloader settings.";
   };
 
   config = lib.mkIf cfg.enable {

@@ -11,7 +11,7 @@ let
 in
 {
   options.modules.base.home-manager = {
-    enable = lib.mkEnableOption "Enable custom home-manager settings.";
+    enable = lib.mkEnableOption "Whether to enable custom home-manager settings.";
   };
 
   config = lib.mkIf cfg.enable {

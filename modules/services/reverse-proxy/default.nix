@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.services.reverse-proxy = {
-    enable = lib.mkEnableOption "Enable custom reverse-proxy settings.";
+    enable = lib.mkEnableOption "Whether to enable custom reverse-proxy settings.";
   };
 
   config = lib.mkIf cfg.enable {

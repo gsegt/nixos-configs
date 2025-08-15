@@ -5,7 +5,7 @@ let
 in
 {
   options.modules.base.editor = {
-    enable = lib.mkEnableOption "Enable common editor settings for all systems";
+    enable = lib.mkEnableOption "Whether to enable custom editor settings.";
   };
 
   config = lib.mkIf cfg.enable {

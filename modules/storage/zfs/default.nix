@@ -5,12 +5,12 @@ let
 in
 {
   options.modules.storage.zfs = {
-    enable = lib.mkEnableOption "Enable custom ZFS module";
+    enable = lib.mkEnableOption "Whether to enable custom ZFS settings.";
 
     extraPools = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "Extra ZFS pools to import.";
+      description = "Name or GUID of extra ZFS pools that you wish to import during boot.";
     };
   };
 
