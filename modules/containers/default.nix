@@ -13,5 +13,9 @@ in
     users.extraGroups.docker.members = [ config.modules.base.userName ];
 
     virtualisation.docker.enable = true;
+
+    environment.sessionVariables = {
+      COMPOSE_BAKE = "true";
+    };
   };
 }
