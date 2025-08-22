@@ -3,6 +3,7 @@
   config,
   pkgs,
   home-manager,
+  sops,
   ...
 }:
 
@@ -15,6 +16,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    sops.secrets."user".neededForUsers = true; # Ensure password is available before creating user
+
     users = {
       users.${config.modules.base.userName} = {
         isNormalUser = true;
@@ -24,7 +27,7 @@ in
           "users"
           "wheel"
         ];
-        initialPassword = "changeme";
+        hashedPasswordFile = config.sops.secrets."user".path;
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDwPeKHdo/JDZ4TsrOVzgY2mEjTi1vL6UZzJ4ulaJpaY"
         ];
