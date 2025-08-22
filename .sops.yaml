@@ -1,0 +1,9 @@
+keys:
+  - &wsl age10ym6s7ugthdhgu6teqsahd7twufdxt4egmx59dugfhfntt747d3qxydq3a
+  - &aspire age1x0p6heagqtuzpqkj4la3nndrvhgz0yesev0zwvkdgf89jfypz5mq4snn0f
+creation_rules:
+  - path_regex: secrets/[^/]+\.yaml$
+    key_groups:
+    - age:
+      - *wsl
+      - *aspire

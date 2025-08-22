@@ -5,6 +5,8 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,6 +16,8 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs-server";
     };
+    sops-nix-server.url = "github:Mic92/sops-nix";
+    sops-nix-server.inputs.nixpkgs.follows = "nixpkgs-server";
   };
 
   outputs =
@@ -21,9 +25,11 @@
       self,
       nixpkgs,
       home-manager,
+      sops-nix,
       nixos-wsl,
       nixpkgs-server,
       home-manager-server,
+      sops-nix-server,
       ...
     }:
     {
@@ -31,6 +37,7 @@
         system = "x86_64-linux";
         modules = [
           home-manager.nixosModules.home-manager
+          sops-nix.nixosModules.sops
           nixos-wsl.nixosModules.wsl
           ./machines/wsl
         ];
@@ -39,6 +46,7 @@
         system = "x86_64-linux";
         modules = [
           home-manager-server.nixosModules.home-manager
+          sops-nix-server.nixosModules.sops
           ./machines/aspire
         ];
       };
