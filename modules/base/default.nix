@@ -50,6 +50,13 @@ in
 
     networking.hostName = cfg.hostName;
 
+    sops = {
+      defaultSopsFile = ../../secrets/default.yaml;
+      age.keyFile = "/etc/nixos/machines/${cfg.hostName}/age/keys.txt"; # Use absolute path to avoid conflict with nix store
+      secrets = {
+      };
+    };
+
     system.stateVersion = "25.05";
   };
 }
