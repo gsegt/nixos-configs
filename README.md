@@ -188,7 +188,7 @@ This will open your editor. Add your secrets, save, and close the editor. The fi
 
 5. Run `sudo mkdir -vp /mnt/etc/nixos` to create the folder for our config
 6. Run `sudo chown nixos:users /mnt/etc/nixos` to let the current user have full permissions over the folder
-7. Run `git clone git@github.com:gsegt/nixfiles.git /mnt/etc/nixos` to clone the configuration is the appropriate repo
+7. Run `git clone git@github.com:gsegt/nixos-configs.git /mnt/etc/nixos` to clone the configuration is the appropriate repo
 
 #### 3.1.3. Generate hardware-config
 
@@ -243,7 +243,7 @@ This will open your editor. Add your secrets, save, and close the editor. The fi
 2. Run `sudo chown nixos:users /etc/nixos` to let the current user have full permissions over the folder
 3. Run `rm -rf /etc/nixos/*` to clean the `nixos` folder
 4. Run `nix-shell -p git` to temporarily install `git`
-5. Run `git clone git@github.com:gsegt/nixfiles.git /etc/nixos` to clone the configuration is the appropriate repo
+5. Run `git clone git@github.com:gsegt/nixos-configs.git /etc/nixos` to clone the configuration is the appropriate repo
 
 #### 3.2.3. Activate SOPS-Nix
 
