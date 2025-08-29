@@ -16,6 +16,7 @@ in
       flaresolverr.enable = true;
       prowlarr.enable = true;
       radarr.enable = true;
+      sonarr.enable = true;
     };
   };
 }
