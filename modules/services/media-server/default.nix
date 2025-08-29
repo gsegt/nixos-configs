@@ -15,6 +15,7 @@ in
     modules.services.media-server = {
       flaresolverr.enable = true;
       prowlarr.enable = true;
+      radarr.enable = true;
     };
   };
 }
