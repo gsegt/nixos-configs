@@ -32,9 +32,6 @@ in
       virtualHosts."jellyfin.gsegt.eu".extraConfig = ''
         reverse_proxy localhost:8096
       '';
-      virtualHosts."jellyseerr.gsegt.eu".extraConfig = ''
-        reverse_proxy localhost:5055
-      '';
       virtualHosts."nextcloud.gsegt.eu".extraConfig = ''
         redir /.well-known/carddav /remote.php/dav/ 301
         redir /.well-known/caldav /remote.php/dav/ 301
