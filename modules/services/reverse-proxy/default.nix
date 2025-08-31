@@ -6,12 +6,23 @@ in
 {
   options.modules.services.reverse-proxy = {
     enable = lib.mkEnableOption "Whether to enable custom reverse-proxy settings.";
+
+    domain = lib.mkOption {
+      type = lib.types.str;
+      default = "gsegt.eu";
+    };
+
+    service = lib.mkOption {
+      type = lib.types.str;
+      default = "caddy";
+      description = "The reverse proxy service to use (e.g., caddy, nginx).";
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    services.caddy = {
+    services.${cfg.service} = {
       enable = true;
-      email = "hostmaster@gsegt.eu";
+      email = "hostmaster@${cfg.domain}";
       virtualHosts."immich.gsegt.eu".extraConfig = ''
         reverse_proxy localhost:2283
       '';
