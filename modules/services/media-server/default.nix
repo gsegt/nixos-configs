@@ -15,6 +15,7 @@ in
     modules.services.media-server = {
       bazarr.enable = true;
       flaresolverr.enable = true;
+      jellyseerr.enable = true;
       prowlarr.enable = true;
       radarr.enable = true;
       recyclarr.enable = true;
