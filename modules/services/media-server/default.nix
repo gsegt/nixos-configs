@@ -13,6 +13,7 @@ in
 
   config = lib.mkIf cfg.enable {
     modules.services.media-server = {
+      flaresolverr.enable = true;
       prowlarr.enable = true;
     };
   };
