@@ -13,6 +13,7 @@ in
 
   config = lib.mkIf cfg.enable {
     modules.services.media-server = {
+      prowlarr.enable = true;
     };
   };
 }
