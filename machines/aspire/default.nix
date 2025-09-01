@@ -35,6 +35,7 @@
 
   modules.services = {
     mealie.enable = true;
+    media-server.enable = true;
     reverse-proxy.enable = true;
   };
 
