@@ -19,6 +19,7 @@ in
       radarr.enable = true;
       recyclarr.enable = true;
       sonarr.enable = true;
+      wireguard-netns.enable = true;
     };
   };
 }
