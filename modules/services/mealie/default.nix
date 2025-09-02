@@ -1,36 +1,27 @@
 { lib, config, ... }:
 
 let
-  cfg = config.modules.services.mealie;
+  service = "mealie";
+  cfg = config.modules.services.${service};
 in
 {
-  options.modules.services.mealie = {
-    enable = lib.mkEnableOption "Whether to enable custom Mealie settings.";
-
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 9000;
-      description = "Port on which to serve the Mealie service.";
-    };
-
-    url = lib.mkOption {
-      type = lib.types.str;
-      default = "mealie.gsegt.eu";
-    };
+  options.modules.services.${service} = {
+    enable = lib.mkEnableOption "Whether to enable custom ${service} settings.";
   };
 
   config = lib.mkIf cfg.enable {
-    services.mealie = {
+    services.${service} = {
       enable = true;
-      port = cfg.port;
       settings = {
         ALLOW_SIGNUP = "false";
         TZ = config.time.timeZone;
       };
     };
 
-    services.caddy.virtualHosts."${cfg.url}".extraConfig = ''
-      reverse_proxy localhost:${toString cfg.port}
-    '';
+    services.${config.modules.services.reverse-proxy.service} = {
+      virtualHosts."${service}.${config.modules.services.reverse-proxy.domain}".extraConfig = ''
+        reverse_proxy localhost:${toString config.services.${service}.port}
+      '';
+    };
   };
 }
