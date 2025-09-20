@@ -15,7 +15,7 @@ in
       openFirewall = true;
     };
 
-    services.caddy = {
+    services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${service}.${config.modules.services.reverse-proxy.domain}".extraConfig = ''
         reverse_proxy localhost:${toString config.services.${service}.port}
       '';
