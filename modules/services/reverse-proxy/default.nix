@@ -40,5 +40,11 @@ in
       80
       443
     ];
+
+    modules.services.dyndns-ovh.subdomains = [
+      "immich"
+      "joplin"
+      "nextcloud"
+    ];
   };
 }
