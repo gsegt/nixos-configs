@@ -35,6 +35,7 @@
   };
 
   modules.services = {
+    dyndns-ovh.enable = true;
     mealie.enable = true;
     media-server.enable = true;
     reverse-proxy.enable = true;

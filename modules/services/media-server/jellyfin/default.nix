@@ -24,5 +24,7 @@ in
         reverse_proxy localhost:8096
       '';
     };
+
+    modules.services.dyndns-ovh.subdomains = [ "${service}" ];
   };
 }

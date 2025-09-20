@@ -23,5 +23,7 @@ in
         reverse_proxy localhost:${toString config.services.${service}.port}
       '';
     };
+
+    modules.services.dyndns-ovh.subdomains = [ "${service}" ];
   };
 }
