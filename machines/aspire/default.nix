@@ -36,6 +36,10 @@
 
   modules.services = {
     dyndns-ovh.enable = true;
+    immich = {
+      enable = true;
+      mediaDir = "/media/external/data-vault/services/immich";
+    };
     mealie.enable = true;
     media-server.enable = true;
     radicale.enable = true;

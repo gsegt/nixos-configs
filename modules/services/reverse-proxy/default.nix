@@ -23,9 +23,6 @@ in
     services.${cfg.service} = {
       enable = true;
       email = "hostmaster@${cfg.domain}";
-      virtualHosts."immich.gsegt.eu".extraConfig = ''
-        reverse_proxy localhost:2283
-      '';
       virtualHosts."joplin.gsegt.eu".extraConfig = ''
         reverse_proxy localhost:22300
       '';
@@ -42,7 +39,6 @@ in
     ];
 
     modules.services.dyndns-ovh.subdomains = [
-      "immich"
       "joplin"
       "nextcloud"
     ];
