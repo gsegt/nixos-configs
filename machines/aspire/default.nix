@@ -38,6 +38,7 @@
     dyndns-ovh.enable = true;
     mealie.enable = true;
     media-server.enable = true;
+    radicale.enable = true;
     reverse-proxy.enable = true;
   };
 
