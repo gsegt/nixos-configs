@@ -42,6 +42,10 @@
     };
     mealie.enable = true;
     media-server.enable = true;
+    ocis = {
+      enable = true;
+      stateDir = "/media/external/data-vault/services/ocis";
+    };
     radicale.enable = true;
     reverse-proxy.enable = true;
   };
