@@ -54,4 +54,6 @@
   services.logind.lidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;
+
+  nixpkgs.config.allowUnfree = true;
 }
