@@ -26,11 +26,6 @@ in
       virtualHosts."joplin.gsegt.eu".extraConfig = ''
         reverse_proxy localhost:22300
       '';
-      virtualHosts."nextcloud.gsegt.eu".extraConfig = ''
-        redir /.well-known/carddav /remote.php/dav/ 301
-        redir /.well-known/caldav /remote.php/dav/ 301
-        reverse_proxy localhost:8888
-      '';
     };
 
     networking.firewall.allowedTCPPorts = [
@@ -40,7 +35,6 @@ in
 
     modules.services.dyndns-ovh.subdomains = [
       "joplin"
-      "nextcloud"
     ];
   };
 }
