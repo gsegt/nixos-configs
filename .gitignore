@@ -5,3 +5,7 @@ node_modules/
 # sops
 *.dec.*
 keys.txt
+
+# Containers
+docker-compose.yml
+.env
