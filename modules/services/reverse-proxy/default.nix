@@ -23,18 +23,11 @@ in
     services.${cfg.service} = {
       enable = true;
       email = "hostmaster@${cfg.domain}";
-      virtualHosts."joplin.gsegt.eu".extraConfig = ''
-        reverse_proxy localhost:22300
-      '';
     };
 
     networking.firewall.allowedTCPPorts = [
       80
       443
-    ];
-
-    modules.services.dyndns-ovh.subdomains = [
-      "joplin"
     ];
   };
 }

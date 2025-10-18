@@ -40,6 +40,10 @@
       enable = true;
       mediaDir = "/media/external/data-vault/services/immich";
     };
+    joplin = {
+      enable = true;
+      volumeDir = "/media/external/data-vault/services/joplin";
+    };
     mealie.enable = true;
     media-server.enable = true;
     ocis = {
