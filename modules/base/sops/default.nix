@@ -17,7 +17,11 @@ in
   config = lib.mkIf cfg.enable {
     sops = {
       defaultSopsFile = ../../../secrets/default.yaml;
-      age.keyFile = "/etc/secrets/sops/age/keys.txt"; # Use absolute path to avoid conflict with nix store
+      age = {
+        keyFile = "/etc/secrets/sops/age/keys.txt"; # Use absolute path to avoid conflict with nix store
+        sshKeyPaths = [ ];
+      };
+      gnupg.sshKeyPaths = [ ];
     };
   };
 }
