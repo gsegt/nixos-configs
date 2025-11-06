@@ -7,7 +7,6 @@
     extraConfig = {
       core = {
         autocrlf = "input";
-        eol = "lf";
       };
       init = {
         defaultBranch = "main";
