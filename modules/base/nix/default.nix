@@ -15,7 +15,7 @@ in
           "nix-command"
           "flakes"
         ];
-        download-buffer-size = 134217728; # 128 MiB
+        download-buffer-size = 268435456; # 256 MiB
       };
       gc = {
         automatic = true;
