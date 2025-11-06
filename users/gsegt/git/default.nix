@@ -5,6 +5,9 @@
     userEmail = "git@gsegt.eu";
     # Sections are to mimic the final configuration
     extraConfig = {
+      advice = {
+        skippedCherryPicks = "false";
+      };
       core = {
         autocrlf = "input";
       };
@@ -15,11 +18,8 @@
         rebase = "true";
       };
       rebase = {
-        autostash = "true";
         autosquash = "true";
-      };
-      advice = {
-        skippedCherryPicks = "false";
+        autostash = "true";
       };
     };
   };
