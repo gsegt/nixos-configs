@@ -10,10 +10,13 @@ in
 
   config = lib.mkIf cfg.enable {
     nix = {
-      settings.experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
+      settings = {
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+        download-buffer-size = 134217728; # 128 MiB
+      };
       gc = {
         automatic = true;
         options = "--delete-older-than 7d";
