@@ -17,6 +17,9 @@
       pull = {
         rebase = "true";
       };
+      push = {
+        autoSetupRemote = "true";
+      };
       rebase = {
         autosquash = "true";
         autostash = "true";
