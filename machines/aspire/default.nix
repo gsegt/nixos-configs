@@ -59,7 +59,7 @@
     extraPools = [ "data-vault" ];
   };
 
-  services.logind.lidSwitch = "ignore";
+  services.logind.settings.Login.HandleLidSwitch = "ignore";
 
   hardware.nvidiaOptimus.disable = true;
 
