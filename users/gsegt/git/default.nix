@@ -1,10 +1,7 @@
 {
   programs.git = {
     enable = true;
-    userName = "gsegt";
-    userEmail = "git@gsegt.eu";
-    # Sections are to mimic the final configuration
-    extraConfig = {
+    settings = {
       advice = {
         skippedCherryPicks = "false";
       };
@@ -23,6 +20,10 @@
       rebase = {
         autosquash = "true";
         autostash = "true";
+      };
+      user = {
+        email = "git@gsegt.eu";
+        name = "gsegt";
       };
     };
   };

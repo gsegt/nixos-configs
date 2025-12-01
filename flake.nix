@@ -11,9 +11,9 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-25.05-small";
+    nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-25.11-small";
     home-manager-server = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-server";
     };
     sops-nix-server.url = "github:Mic92/sops-nix";
