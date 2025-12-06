@@ -17,8 +17,6 @@ in
       group = config.modules.base.userName;
     };
 
-    systemd.services.${service}.environment.LIBVA_DRIVER_NAME = "iHD";
-
     services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${service}.${config.modules.services.reverse-proxy.domain}".extraConfig = ''
         reverse_proxy localhost:8096
