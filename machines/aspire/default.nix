@@ -45,7 +45,12 @@
       volumeDir = "/media/external/data-vault/services/joplin";
     };
     mealie.enable = true;
-    media-server.enable = true;
+    media-server = {
+      enable = true;
+      savePath = "/media/external/data-vault/media-server/torrents";
+      subnetWhitelist = "192.168.1.0/24";
+      torrentingPort = 47563;
+    };
     ocis = {
       enable = true;
       stateDir = "/media/external/data-vault/services/ocis";

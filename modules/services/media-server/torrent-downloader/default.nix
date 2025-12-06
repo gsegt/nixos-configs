@@ -12,6 +12,18 @@ in
 {
   options.modules.services.media-server.torrent-downloader = {
     enable = lib.mkEnableOption "Whether to enable custom torrent-downloader settings.";
+
+    savePath = lib.mkOption {
+      type = lib.types.path;
+    };
+
+    subnetWhitelist = lib.mkOption {
+      type = lib.types.str;
+    };
+
+    torrentingPort = lib.mkOption {
+      type = lib.types.int;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -21,15 +33,41 @@ in
 
     services.qbittorrent = {
       enable = true;
-      torrentingPort = 47563;
+      torrentingPort = cfg.torrentingPort;
       openFirewall = true;
       user = config.modules.base.userName;
       group = config.modules.base.userName;
       serverConfig = {
+        BitTorrent = {
+          Session = {
+            BTProtocol = "TCP";
+            DefaultSavePath = cfg.savePath;
+            DisableAutoTMMByDefault = false;
+            DisableAutoTMMTriggers = {
+              CategorySavePathChanged = false;
+              DefaultSavePathChanged = false;
+            };
+            MaxConnections = -1;
+            MaxConnectionsPerTorrent = -1;
+            MaxUploads = -1;
+            MaxUploadsPerTorrent = -1;
+            Preallocation = true;
+            QueueingSystemEnabled = false;
+            TempPath = "${cfg.savePath}/incomplete";
+            TempPathEnabled = true;
+            TorrentContentLayout = "Subfolder";
+          };
+        };
+        Network = {
+          PortForwardingEnabled = false;
+        };
         Preferences = {
           WebUI = {
             AlternativeUIEnabled = true;
             RootFolder = "${pkgs.vuetorrent}/share/vuetorrent";
+            AuthSubnetWhitelist = cfg.subnetWhitelist;
+            AuthSubnetWhitelistEnabled = true;
+            LocalHostAuth = false;
           };
         };
       };
