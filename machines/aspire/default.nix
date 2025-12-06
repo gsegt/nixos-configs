@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./qsv-hardware-acceleration.nix
+    ./video-hardware-acceleration.nix
     ../../modules
   ];
 

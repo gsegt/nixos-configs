@@ -17,6 +17,7 @@ in
       enable = true;
       openFirewall = true;
       mediaLocation = "${cfg.mediaDir}";
+      accelerationDevices = [ "/dev/dri/renderD128" ];
     };
 
     systemd.tmpfiles.rules = [
@@ -24,11 +25,8 @@ in
     ];
 
     users.users.${config.services.${service}.user}.extraGroups = [
-      "video"
       "render"
     ];
-
-    systemd.services.immich-machine-learning.environment.LIBVA_DRIVER_NAME = "iHD";
 
     services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${service}.${config.modules.services.reverse-proxy.domain}".extraConfig = ''
