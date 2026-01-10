@@ -51,6 +51,7 @@
       subnetWhitelist = "192.168.1.0/24";
       torrentingPort = 47563;
     };
+    monitoring.enable = true;
     ocis = {
       enable = true;
       stateDir = "/media/external/data-vault/services/ocis";
