@@ -55,6 +55,10 @@
       enable = true;
       stateDir = "/media/external/data-vault/services/ocis";
     };
+    paperless = {
+      enable = true;
+      mediaDir = "/media/external/data-vault/services/paperless";
+    };
     radicale.enable = true;
     reverse-proxy.enable = true;
   };
