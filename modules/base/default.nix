@@ -44,7 +44,7 @@ in
 
     environment.systemPackages = with pkgs; [
       git # Necessary for home manager
-      nixfmt-rfc-style # For formatting Nix files
+      nixfmt # For formatting Nix files
     ];
 
     time.timeZone = cfg.timeZone;
