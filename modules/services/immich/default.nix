@@ -21,7 +21,7 @@ in
     };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.mediaDir} 0755 ${config.services.${service}.user} ${config.services.${service}.group} - -"
+      "d ${cfg.mediaDir} 1755 ${config.services.${service}.user} ${config.services.${service}.group} - -"
     ];
 
     users.users.${config.services.${service}.user}.extraGroups = [
