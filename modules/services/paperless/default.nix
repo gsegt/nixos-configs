@@ -15,8 +15,8 @@ in
 
   config = lib.mkIf cfg.enable {
     sops.secrets."paperless_admin_password" = {
-      owner = "${config.services.${service}.user}";
-      group = "${config.services.${service}.user}";
+      owner = config.services.${service}.user;
+      group = config.services.${service}.user;
     };
 
     services.${service} = {
@@ -24,11 +24,11 @@ in
       passwordFile = config.sops.secrets."paperless_admin_password".path;
       domain = "${service}.${config.modules.services.reverse-proxy.domain}";
       mediaDir = "${cfg.mediaDir}";
+      database.createLocally = true;
+      settings = {
+        PAPERLESS_OCR_LANGUAGE = "eng+fra";
+      };
     };
-
-    networking.firewall.allowedTCPPorts = [
-      config.services.${service}.port
-    ];
 
     systemd.tmpfiles.rules = [
       "d ${cfg.mediaDir} 1755 ${config.services.${service}.user} ${config.services.${service}.user} - -"
