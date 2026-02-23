@@ -7,6 +7,11 @@ in
 {
   options.modules.services.${service} = {
     enable = lib.mkEnableOption "Whether to enable custom ${service} settings.";
+
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 5232;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -20,7 +25,7 @@ in
       settings = {
         server = {
           hosts = [
-            "localhost:5232"
+            "localhost:${toString cfg.port}"
           ];
         };
 
@@ -31,10 +36,6 @@ in
         };
       };
     };
-
-    networking.firewall.allowedTCPPorts = [
-      5232
-    ];
 
     services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${service}.${config.modules.services.reverse-proxy.domain}".extraConfig = ''
