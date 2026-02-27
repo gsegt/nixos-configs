@@ -11,7 +11,7 @@ in
 
   config = lib.mkIf cfg.enable {
     sops.secrets."msmtp_default_password" = {
-      mode = "444";
+      mode = "0444";
     };
 
     programs.${program} = {
