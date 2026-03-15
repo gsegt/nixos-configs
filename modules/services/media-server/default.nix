@@ -40,6 +40,7 @@ in
         torrentingPort = cfg.torrentingPort;
       };
       wireguard-netns.enable = true;
+      ygege.enable = true;
     };
   };
 }
