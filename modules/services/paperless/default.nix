@@ -25,6 +25,7 @@ in
       domain = "${service}.${config.modules.services.reverse-proxy.domain}";
       mediaDir = "${cfg.mediaDir}";
       database.createLocally = true;
+      configureTika = true;
       settings = {
         PAPERLESS_OCR_LANGUAGE = "eng+fra";
       };
