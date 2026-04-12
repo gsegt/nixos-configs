@@ -63,6 +63,9 @@ in
           "OC\\Preview\\XBitmap"
         ];
       };
+      phpOptions = {
+        "opcache.interned_strings_buffer" = "23";
+      };
       extraAppsEnable = true;
       autoUpdateApps.enable = true;
       extraApps = {
