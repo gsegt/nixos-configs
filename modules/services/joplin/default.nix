@@ -53,6 +53,9 @@ in
       ports = [
         "${toString port}:22300/tcp"
       ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
       dependsOn = [
         "joplin-postgres"
       ];
@@ -90,6 +93,9 @@ in
       volumes = [
         "${cfg.volumeDir}/postgresql/data:/var/lib/postgresql/data:rw"
       ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
       log-driver = "journald";
       extraOptions = [
         "--network-alias=joplin-postgres"
