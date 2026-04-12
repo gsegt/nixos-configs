@@ -18,13 +18,16 @@ in
   config = lib.mkIf cfg.enable {
     # Containers
     virtualisation.oci-containers.containers."ygege" = {
-      image = "uwucode/ygege:latest";
+      image = "docker.io/uwucode/ygege:latest";
       environment = {
         "LOG_LEVEL" = "info";
       };
       ports = [
         "8715:8715/tcp"
       ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
       log-driver = "journald";
       extraOptions = [
         "--health-cmd=curl --fail http://localhost:\${BIND_PORT:-8715}/health || exit 1"
