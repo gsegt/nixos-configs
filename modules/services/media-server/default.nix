@@ -2,6 +2,7 @@
 
 let
   utils = import ../../../utils;
+  baseVolumeDir = "/media/external/data-vault/services/media-server";
   cfg = config.modules.services.media-server;
 in
 {
@@ -24,14 +25,21 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules = [
+      "d ${baseVolumeDir} 0755 root root - -"
+    ];
+
     modules.services.media-server = {
       bazarr.enable = true;
+      clonarr = {
+        enable = true;
+        volumeDir = "${baseVolumeDir}/clonarr";
+      };
       flaresolverr.enable = true;
       jellyfin.enable = true;
       jellyseerr.enable = true;
       prowlarr.enable = true;
       radarr.enable = true;
-      recyclarr.enable = true;
       sonarr.enable = true;
       torrent-downloader = {
         enable = true;
