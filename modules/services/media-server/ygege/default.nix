@@ -8,6 +8,7 @@
 
 let
   service = "ygege";
+  port = 8715;
   cfg = config.modules.services.media-server.${service};
 in
 {
@@ -23,7 +24,7 @@ in
         "LOG_LEVEL" = "info";
       };
       ports = [
-        "8715:8715/tcp"
+        "${toString port}:8715/tcp"
       ];
       labels = {
         "io.containers.autoupdate" = "registry";
