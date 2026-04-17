@@ -38,6 +38,7 @@ in
         enable = true;
         volumeDir = "${cfg.baseVolumeDir}/clonarr";
       };
+      filebrowser.enable = true;
       flaresolverr.enable = true;
       jellyfin.enable = true;
       jellyseerr.enable = true;
