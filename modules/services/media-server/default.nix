@@ -10,7 +10,7 @@ in
   options.modules.services.media-server = {
     enable = lib.mkEnableOption "Whether to enable custom media server settings.";
 
-    savePath = lib.mkOption {
+    baseSavePath = lib.mkOption {
       type = lib.types.path;
     };
 
@@ -38,7 +38,10 @@ in
         enable = true;
         volumeDir = "${cfg.baseVolumeDir}/clonarr";
       };
-      filebrowser.enable = true;
+      filebrowser = {
+        enable = true;
+        rootDir = "${cfg.baseSavePath}/media";
+      };
       flaresolverr.enable = true;
       jellyfin.enable = true;
       jellyseerr.enable = true;
@@ -48,11 +51,11 @@ in
       qui = {
         enable = true;
         volumeDir = "${cfg.baseVolumeDir}/qui";
-        qbittorrentSavePath = cfg.savePath;
+        qbittorrentSavePath = "${cfg.baseSavePath}/torrents";
       };
       torrent-downloader = {
         enable = true;
-        savePath = cfg.savePath;
+        savePath = "${cfg.baseSavePath}/torrents";
         subnetWhitelist = cfg.subnetWhitelist;
         torrentingPort = cfg.torrentingPort;
       };
