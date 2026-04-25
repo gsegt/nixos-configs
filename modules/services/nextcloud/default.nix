@@ -7,6 +7,7 @@
 
 let
   service = "nextcloud";
+  port = 8081;
   cfg = config.modules.services.${service};
 in
 {
@@ -19,7 +20,7 @@ in
 
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8081;
+      default = port;
     };
   };
 
