@@ -28,6 +28,7 @@ in
       configureTika = true;
       settings = {
         PAPERLESS_OCR_LANGUAGE = "eng+fra";
+        PAPERLESS_FILENAME_FORMAT = "{{ title }}--{{ created }}";
       };
     };
 
