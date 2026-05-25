@@ -16,7 +16,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.rootDir} 0755 services.${service}.user services.${service}.group - -"
+      "d ${cfg.rootDir} 0755 ${config.services.${service}.user} ${config.services.${service}.group} - -"
     ];
 
     services.${service} = {
