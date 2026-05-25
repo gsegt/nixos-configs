@@ -11,7 +11,7 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-25.11-small";
+    nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-25.11";
     home-manager-server = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-server";
