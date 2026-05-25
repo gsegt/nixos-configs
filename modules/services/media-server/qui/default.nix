@@ -9,6 +9,8 @@
 let
   service = "qui";
   port = 7476;
+  uid = config.users.users.${config.modules.base.userName}.uid;
+  gid = config.users.groups.${config.modules.base.userName}.gid;
   cfg = config.modules.services.media-server.${service};
 in
 {
@@ -26,7 +28,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.volumeDir}/config 0755 root root - -"
+      "d ${cfg.volumeDir}/config 0755 ${toString uid} ${toString gid} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
@@ -46,6 +48,7 @@ in
       labels = {
         "io.containers.autoupdate" = "registry";
       };
+      user = "${toString uid}:${toString gid}";
       log-driver = "journald";
       extraOptions = [
         "--network-alias=qui"
