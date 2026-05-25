@@ -47,8 +47,7 @@
     mealie.enable = true;
     media-server = {
       enable = true;
-      baseVolumeDir = "/media/external/data-vault/services/media-server";
-      baseSavePath = "/media/external/data-vault/media-server";
+      baseDir = "/media/external/data-vault/services/media-server";
       subnetWhitelist = "192.168.1.0/24";
       torrentingPort = 47563;
     };

@@ -10,11 +10,7 @@ in
   options.modules.services.media-server = {
     enable = lib.mkEnableOption "Whether to enable custom media server settings.";
 
-    baseSavePath = lib.mkOption {
-      type = lib.types.path;
-    };
-
-    baseVolumeDir = lib.mkOption {
+    baseDir = lib.mkOption {
       type = lib.types.path;
     };
 
@@ -29,18 +25,18 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.baseVolumeDir} 0755 root root - -"
+      "d ${cfg.baseDir} 0755 ${config.modules.base.userName} ${config.modules.base.userName} - -"
     ];
 
     modules.services.media-server = {
       bazarr.enable = true;
       clonarr = {
         enable = true;
-        volumeDir = "${cfg.baseVolumeDir}/clonarr";
+        volumeDir = "${cfg.baseDir}/clonarr";
       };
       filebrowser = {
         enable = true;
-        rootDir = "${cfg.baseSavePath}/media";
+        rootDir = "${cfg.baseDir}/media";
       };
       flaresolverr.enable = true;
       jellyfin.enable = true;
@@ -50,12 +46,12 @@ in
       sonarr.enable = true;
       qui = {
         enable = true;
-        volumeDir = "${cfg.baseVolumeDir}/qui";
-        qbittorrentSavePath = "${cfg.baseSavePath}/torrents";
+        volumeDir = "${cfg.baseDir}/qui";
+        qbittorrentSavePath = "${cfg.baseDir}/torrents";
       };
       torrent-downloader = {
         enable = true;
-        savePath = "${cfg.baseSavePath}/torrents";
+        savePath = "${cfg.baseDir}/torrents";
         subnetWhitelist = cfg.subnetWhitelist;
         torrentingPort = cfg.torrentingPort;
       };
