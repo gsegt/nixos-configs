@@ -33,7 +33,7 @@ in
     };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.mediaDir} 1755 ${config.services.${service}.user} ${config.services.${service}.user} - -"
+      "d ${cfg.mediaDir} 0755 ${config.services.${service}.user} ${config.services.${service}.user} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {

@@ -84,7 +84,7 @@ in
     ];
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 1755 ${service} ${service} - -"
+      "d ${cfg.dataDir} 0755 ${service} ${service} - -"
     ];
 
     services.collabora-online = {
