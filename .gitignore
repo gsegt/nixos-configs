@@ -1,6 +1,8 @@
 ## nodejs
+.npmrc
 package*.json
 node_modules/
+commitlint.config.js
 
 # sops
 *.dec.*
