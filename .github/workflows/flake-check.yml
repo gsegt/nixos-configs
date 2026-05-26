@@ -1,14 +1,14 @@
 name: flake-check
 run-name: Check nix flake
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   flake-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install Nix
         uses: cachix/install-nix-action@v31
       - name: Check flake
