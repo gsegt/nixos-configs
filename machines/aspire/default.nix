@@ -56,6 +56,10 @@
       enable = true;
       dataDir = "/media/external/data-vault/services/nextcloud";
     };
+    opencloud = {
+      enable = true;
+      stateDir = "/media/external/data-vault/services/opencloud";
+    };
     paperless = {
       enable = true;
       mediaDir = "/media/external/data-vault/services/paperless";
