@@ -44,11 +44,6 @@ in
       prowlarr.enable = true;
       radarr.enable = true;
       sonarr.enable = true;
-      qui = {
-        enable = true;
-        volumeDir = "${cfg.baseDir}/qui";
-        qbittorrentSavePath = "${cfg.baseDir}/torrents";
-      };
       torrent-downloader = {
         enable = true;
         savePath = "${cfg.baseDir}/torrents";
