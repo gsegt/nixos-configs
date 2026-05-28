@@ -35,6 +35,7 @@
   };
 
   modules.services = {
+    collabora-online.enable = true;
     dyndns-ovh.enable = true;
     immich = {
       enable = true;
