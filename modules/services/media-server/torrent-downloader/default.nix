@@ -40,13 +40,14 @@ in
       serverConfig = {
         BitTorrent = {
           Session = {
+            AddTorrentStopped = false;
             BTProtocol = "TCP";
-            DefaultSavePath = cfg.savePath;
             DisableAutoTMMByDefault = false;
             DisableAutoTMMTriggers = {
               CategorySavePathChanged = false;
               DefaultSavePathChanged = false;
             };
+            DefaultSavePath = "${cfg.savePath}/complete";
             MaxConnections = -1;
             MaxConnectionsPerTorrent = -1;
             MaxUploads = -1;
@@ -55,7 +56,7 @@ in
             QueueingSystemEnabled = false;
             TempPath = "${cfg.savePath}/incomplete";
             TempPathEnabled = true;
-            TorrentContentLayout = "Subfolder";
+            TorrentContentLayout = "Original";
           };
         };
         Network = {
