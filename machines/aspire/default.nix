@@ -53,10 +53,6 @@
       torrentingPort = 47563;
     };
     msmtp.enable = true;
-    nextcloud = {
-      enable = true;
-      dataDir = "/media/external/data-vault/services/nextcloud";
-    };
     opencloud = {
       enable = true;
       stateDir = "/media/external/data-vault/services/opencloud";
