@@ -34,6 +34,7 @@ in
         enable = true;
         volumeDir = "${cfg.baseDir}/clonarr";
       };
+      cross-seed.enable = true;
       filebrowser = {
         enable = true;
         rootDir = "${cfg.baseDir}/media";
