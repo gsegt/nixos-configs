@@ -43,13 +43,23 @@ in
           ];
           hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
         };
-        postCommands = ''
-          # Automatically ask for the password on SSH login
-          echo 'cryptsetup-askpass || echo "Unlock was successful; exiting SSH session" && exit 1' >> /root/.profile
-        '';
       };
     };
 
     boot.kernelParams = [ "ip=${cfg.ip}::${cfg.gateway}:${cfg.mask}:${config.networking.hostName}" ];
+
+    systemd.services = {
+      remote-unlock = {
+        description = "Prepare root .profile for remote unlocking via SSH";
+        wantedBy = [ "initrd.target" ];
+        before = [ "initrd-root-fs.target" ];
+        unitConfig.DefaultDependencies = false;
+        script = ''
+          mkdir -p /var/empty
+          echo "systemd-tty-ask-password-agent --watch" > /var/empty/.profile
+        '';
+        serviceConfig.Type = "oneshot";
+      };
+    };
   };
 }
