@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  baseServicesDir = "/media/external/data-vault/services";
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -39,27 +42,27 @@
     dyndns-ovh.enable = true;
     immich = {
       enable = true;
-      mediaDir = "/media/external/data-vault/services/immich";
+      mediaDir = "${baseServicesDir}/immich";
     };
     joplin = {
       enable = true;
-      volumeDir = "/media/external/data-vault/services/joplin";
+      volumeDir = "${baseServicesDir}/joplin";
     };
     mealie.enable = true;
     media-server = {
       enable = true;
-      baseDir = "/media/external/data-vault/services/media-server";
+      baseDir = "${baseServicesDir}/media-server";
       subnetWhitelist = "192.168.1.0/24";
       torrentingPort = 47563;
     };
     msmtp.enable = true;
     opencloud = {
       enable = true;
-      stateDir = "/media/external/data-vault/services/opencloud";
+      stateDir = "${baseServicesDir}/opencloud";
     };
     paperless = {
       enable = true;
-      mediaDir = "/media/external/data-vault/services/paperless";
+      mediaDir = "${baseServicesDir}/paperless";
     };
     radicale.enable = true;
     reverse-proxy.enable = true;
