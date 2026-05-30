@@ -4,8 +4,10 @@
     generateCompletions = true;
     shellInit = ''
       set -g fish_greeting
-      fish_user_key_bindings
+      set -g fish_key_bindings fish_default_key_bindings
+      fish_config theme choose "default"
       fish_add_path $XDG_BIN_HOME
+      fish_user_key_bindings
     '';
     shellAbbrs = {
       ls = "ls -l";
