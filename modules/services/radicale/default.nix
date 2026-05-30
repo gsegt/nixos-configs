@@ -12,8 +12,8 @@ in
 
   config = lib.mkIf cfg.enable {
     sops.secrets."radicale/htpasswd" = {
-      owner = "${service}";
-      group = "${service}";
+      owner = config.services.${service}.user;
+      group = config.services.${service}.group;
     };
 
     services.${service} = {
