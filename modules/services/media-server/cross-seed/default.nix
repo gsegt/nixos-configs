@@ -25,6 +25,7 @@ in
         linkDirs = [
           "${config.services.qbittorrent.serverConfig.BitTorrent.Session.DefaultSavePath}/cross-seed/"
         ];
+        outputDir = null;
         useGenConfigDefaults = true;
         action = "inject";
         linkType = "hardlink";
