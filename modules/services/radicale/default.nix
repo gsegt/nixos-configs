@@ -2,16 +2,12 @@
 
 let
   service = "radicale";
+  port = 5232;
   cfg = config.modules.services.${service};
 in
 {
   options.modules.services.${service} = {
     enable = lib.mkEnableOption "Whether to enable custom ${service} settings.";
-
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 5232;
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -25,7 +21,7 @@ in
       settings = {
         server = {
           hosts = [
-            "localhost:${toString cfg.port}"
+            "localhost:${toString port}"
           ];
         };
 
