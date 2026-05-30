@@ -60,10 +60,6 @@ in
       enable = true;
       stateDir = "${baseServicesDir}/opencloud";
     };
-    paperless = {
-      enable = true;
-      mediaDir = "${baseServicesDir}/paperless";
-    };
     radicale.enable = true;
     reverse-proxy.enable = true;
   };
