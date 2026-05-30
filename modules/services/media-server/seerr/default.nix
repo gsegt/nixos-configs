@@ -1,7 +1,7 @@
 { lib, config, ... }:
 
 let
-  service = "jellyseerr";
+  service = "seerr";
   cfg = config.modules.services.media-server.${service};
 in
 {

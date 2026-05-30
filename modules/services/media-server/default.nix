@@ -41,9 +41,9 @@ in
       };
       flaresolverr.enable = true;
       jellyfin.enable = true;
-      jellyseerr.enable = true;
       prowlarr.enable = true;
       radarr.enable = true;
+      seerr.enable = true;
       sonarr.enable = true;
       torrent-downloader = {
         enable = true;
