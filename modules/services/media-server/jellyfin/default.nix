@@ -23,6 +23,6 @@ in
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ "${service}" ];
+    modules.services.dyndns-ovh.subdomains = [ service ];
   };
 }

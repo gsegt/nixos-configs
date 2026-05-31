@@ -29,7 +29,7 @@ in
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ "${service}" ];
+    modules.services.dyndns-ovh.subdomains = [ service ];
 
     # Adapted from an auto-generation using compose2nix v0.3.1.
     # Containers

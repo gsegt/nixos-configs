@@ -16,7 +16,7 @@ in
     services.${service} = {
       enable = true;
       openFirewall = true;
-      mediaLocation = "${cfg.mediaDir}";
+      mediaLocation = cfg.mediaDir;
       accelerationDevices = [ "/dev/dri/renderD128" ];
     };
 
@@ -34,7 +34,7 @@ in
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ "${service}" ];
+    modules.services.dyndns-ovh.subdomains = [ service ];
   };
 
 }

@@ -24,7 +24,7 @@ in
         storage.wopi = {
           "@allow" = true;
           host = [
-            "${config.modules.services.reverse-proxy.domain}"
+            config.modules.services.reverse-proxy.domain
           ];
         };
         server_name = "${service}.${config.modules.services.reverse-proxy.domain}";
@@ -37,8 +37,6 @@ in
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [
-      "${service}"
-    ];
+    modules.services.dyndns-ovh.subdomains = [ service ];
   };
 }
