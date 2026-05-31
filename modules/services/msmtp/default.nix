@@ -20,7 +20,7 @@ in
         auth = true;
         from = "sysadmin@${config.modules.services.reverse-proxy.domain}";
         user = "mail@${config.modules.services.reverse-proxy.domain}";
-        host = "ssl0.ovh.net";
+        host = "smtp.mail.ovh.net";
         tls = true;
         port = 587;
         passwordeval = "cat ${config.sops.secrets."msmtp_default_password".path}";
