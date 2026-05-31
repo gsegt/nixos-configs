@@ -62,6 +62,10 @@ in
     };
     radicale.enable = true;
     reverse-proxy.enable = true;
+    vaultwarden = {
+      enable = true;
+      backupDir = "${baseServicesDir}/vaultwarden";
+    };
   };
 
   modules.storage.zfs = {
