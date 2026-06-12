@@ -18,8 +18,8 @@
       bye = "sudo systemctl poweroff";
       reboot = "sudo systemctl reboot";
       watch = "watch -n 1";
-      snrs = "sudo nixos-rebuild switch";
-      snrb = "sudo nixos-rebuild boot";
+      nrs = "nixos-rebuild --sudo switch";
+      nrb = "nixos-rebuild --sudo boot";
       nfu = "nix flake update";
       sops = "nix shell nixpkgs#sops --command sh -c \"SOPS_AGE_KEY_CMD='sudo tail -n 1 /etc/secrets/sops/age/keys.txt' sops /etc/nixos/secrets/default.yaml\"";
     };
