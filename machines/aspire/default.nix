@@ -2,12 +2,18 @@
 
 let
   baseServicesDir = "/media/external/data-vault/services";
+  uid = config.users.users.${config.modules.base.userName}.uid;
+  gid = config.users.groups.${config.modules.base.userName}.gid;
 in
 {
   imports = [
     ./hardware-configuration.nix
     ./video-hardware-acceleration.nix
     ../../modules
+  ];
+
+  systemd.tmpfiles.rules = [
+    "d ${baseServicesDir} 0755 ${toString uid} ${toString gid} - -"
   ];
 
   modules.base = {
