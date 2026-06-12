@@ -8,9 +8,5 @@ commitlint.config.js
 *.dec.*
 keys.txt
 
-# Containers
-docker-compose.yml
-.env
-
 # debug
 *debug*
