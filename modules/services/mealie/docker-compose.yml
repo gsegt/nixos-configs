@@ -1,0 +1,25 @@
+name: &name mealie
+
+services:
+  mealie:
+    container_name: mealie
+    image: ghcr.io/mealie-recipes/mealie:latest
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      BASE_URL: https://mealie.gsegt.eu
+      PUID: 911
+      PGID: 911
+      TZ: Europe/Paris
+    volumes:
+      - /media/external/data-vault/services/mealie/data:/app/data/
+    ports:
+        - 9000:9000
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/mealie/docker-compose.yml -output modules/services/mealie/default-debug.nix

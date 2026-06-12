@@ -54,7 +54,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/joplin";
     };
-    mealie.enable = true;
+    mealie = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/mealie";
+    };
     media-server = {
       enable = true;
       baseDir = "${baseServicesDir}/media-server";
