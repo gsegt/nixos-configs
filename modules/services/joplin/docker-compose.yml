@@ -1,0 +1,47 @@
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+
+name: &name joplin
+
+services:
+  joplin:
+    container_name: joplin
+    image: docker.io/joplin/server:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=https://joplin.gsegt.eu
+      - DB_CLIENT=pg
+      - POSTGRES_DATABASE=joplin
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=joplin-postgres
+      - STORAGE_DRIVER=Type=Filesystem; Path=/data
+    volumes:
+      - /media/external/data-vault/services/joplin/data:/data
+    ports:
+      - 22300:22300
+    depends_on:
+      - joplin-postgres
+    labels:
+      - compose2nix.settings.sops.secrets=joplin/env
+      - io.containers.autoupdate=registry
+
+  joplin-postgres:
+    container_name: joplin-postgres
+    image: docker.io/library/postgres:16-alpine
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      - POSTGRES_DB=joplin
+    volumes:
+      - /media/external/data-vault/services/joplin/postgresql/data:/var/lib/postgresql/data
+    labels:
+      - compose2nix.settings.sops.secrets=joplin/env
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/joplin/docker-compose.yml -output modules/services/joplin/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/joplin/default-debug.nix
