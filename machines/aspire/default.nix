@@ -2,8 +2,6 @@
 
 let
   baseServicesDir = "/media/external/data-vault/services";
-  uid = config.users.users.${config.modules.base.userName}.uid;
-  gid = config.users.groups.${config.modules.base.userName}.gid;
 in
 {
   imports = [
@@ -13,12 +11,15 @@ in
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${baseServicesDir} 0755 ${toString uid} ${toString gid} - -"
+    "d ${baseServicesDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
   ];
 
   modules.base = {
     enable = true;
     userName = "gsegt";
+    groupName = config.modules.base.userName;
+    uid = 1000;
+    gid = config.modules.base.uid;
     hostName = "aspire";
   };
 

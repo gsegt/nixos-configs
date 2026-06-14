@@ -25,7 +25,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.baseDir} 0755 ${config.modules.base.userName} ${config.modules.base.userName} - -"
+      "d ${cfg.baseDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
     ];
 
     modules.services.media-server = {

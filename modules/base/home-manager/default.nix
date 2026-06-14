@@ -21,8 +21,8 @@ in
     users = {
       users.${config.modules.base.userName} = {
         isNormalUser = true;
-        uid = 1000;
-        group = config.modules.base.userName;
+        uid = config.modules.base.uid;
+        group = config.modules.base.groupName;
         extraGroups = [
           "users"
           "wheel"
@@ -34,8 +34,8 @@ in
         shell = pkgs.fish;
       };
       groups = {
-        ${config.modules.base.userName} = {
-          gid = 1000;
+        ${config.modules.base.groupName} = {
+          gid = config.modules.base.gid;
         };
       };
     };

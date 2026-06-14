@@ -15,8 +15,6 @@ let
   postgres_uid = 70;
   postgres_gid = 70;
   postgres_data_volume = "${cfg.volumeDir}/postgresql/data";
-  uid = config.users.users.${config.modules.base.userName}.uid;
-  gid = config.users.groups.${config.modules.base.userName}.gid;
   cfg = config.modules.services.${service};
 in
 {
@@ -30,7 +28,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.volumeDir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.userName} - -"
       "d ${joplin_data_volume} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
       "d ${postgres_data_volume} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];

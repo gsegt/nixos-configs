@@ -12,8 +12,6 @@ let
   mealie_uid = 911;
   mealie_gid = 911;
   mealie_data_volume = "${cfg.volumeDir}/data";
-  uid = config.users.users.${config.modules.base.userName}.uid;
-  gid = config.users.groups.${config.modules.base.userName}.gid;
   cfg = config.modules.services.${service};
 in
 {
@@ -27,7 +25,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.volumeDir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
       "d ${mealie_data_volume} 0755 ${toString mealie_uid} ${toString mealie_gid} - -"
     ];
 

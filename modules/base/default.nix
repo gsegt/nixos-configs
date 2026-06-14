@@ -17,7 +17,22 @@ in
 
     userName = lib.mkOption {
       type = lib.types.str;
-      description = "Username of the primary user.";
+      description = "User name of the primary user.";
+    };
+
+    groupName = lib.mkOption {
+      type = lib.types.str;
+      description = "Group name of the primary user.";
+    };
+
+    uid = lib.mkOption {
+      type = lib.types.int;
+      description = "User ID of the primary user.";
+    };
+
+    gid = lib.mkOption {
+      type = lib.types.int;
+      description = "Group ID of the primary user.";
     };
 
     hostName = lib.mkOption {
