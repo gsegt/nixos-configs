@@ -45,7 +45,6 @@ in
   };
 
   modules.services = {
-    collabora-online.enable = false;
     dyndns-ovh.enable = true;
     immich = {
       enable = true;
@@ -68,7 +67,7 @@ in
     msmtp.enable = true;
     opencloud = {
       enable = true;
-      stateDir = "${baseServicesDir}/opencloud";
+      volumeDir = "${baseServicesDir}/opencloud";
     };
     radicale.enable = true;
     reverse-proxy.enable = true;

@@ -1,0 +1,3 @@
+[submodule "modules/services/opencloud/compose"]
+	path = modules/services/opencloud/compose
+	url = https://github.com/opencloud-eu/opencloud-compose.git
