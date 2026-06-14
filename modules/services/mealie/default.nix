@@ -42,8 +42,8 @@ in
       image = "ghcr.io/mealie-recipes/mealie:latest";
       environment = {
         "BASE_URL" = "https://${uri}";
-        "PGID" = "${toString mealie_gid}";
-        "PUID" = "${toString mealie_uid}";
+        "PGID" = toString mealie_gid;
+        "PUID" = toString mealie_uid;
         "TZ" = config.time.timeZone;
       };
       volumes = [
