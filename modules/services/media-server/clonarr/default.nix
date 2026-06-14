@@ -9,8 +9,9 @@
 let
   service = "clonarr";
   port = 6060;
-  uid = config.users.users.${config.modules.base.userName}.uid;
-  gid = config.users.groups.${config.modules.base.userName}.gid;
+  clonarr_config_volume = "${cfg.volumeDir}/config";
+  clonarr_uid = config.modules.base.uid;
+  clonarr_gid = config.modules.base.gid;
   cfg = config.modules.services.media-server.${service};
 in
 {
@@ -24,7 +25,8 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.volumeDir}/config 0755 ${toString uid} ${toString gid} - -"
+      "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
+      "d ${clonarr_config_volume} 0755 ${toString clonarr_uid} ${toString clonarr_gid} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
@@ -35,12 +37,12 @@ in
     virtualisation.oci-containers.containers."clonarr" = {
       image = "ghcr.io/prophetse7en/clonarr:latest";
       environment = {
-        "PGID" = toString uid;
-        "PUID" = toString gid;
+        "PGID" = toString clonarr_gid;
+        "PUID" = toString clonarr_uid;
         "TZ" = "Europe/Paris";
       };
       volumes = [
-        "${cfg.volumeDir}/config:/config:rw"
+        "${clonarr_config_volume}:/config:rw"
       ];
       ports = [
         "${toString port}:6060/tcp"
