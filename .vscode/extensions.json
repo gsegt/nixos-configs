@@ -2,6 +2,8 @@
     "recommendations": [
         "davidanson.vscode-markdownlint",
         "jnoortheen.nix-ide",
+        "ms-azuretools.vscode-containers",
+        "streetsidesoftware.code-spell-checker-british-english",
         "streetsidesoftware.code-spell-checker",
         "yzhang.markdown-all-in-one",
     ]
