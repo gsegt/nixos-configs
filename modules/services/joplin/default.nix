@@ -7,14 +7,15 @@
 
 let
   service = "joplin";
-  port = 22300;
-  uri = "${service}.${config.modules.services.reverse-proxy.domain}";
+  joplin_port = 22300;
+  joplin_subdomain = service;
+  joplin_uri = "${joplin_subdomain}.${config.modules.services.reverse-proxy.domain}";
   joplin_uid = 1001;
   joplin_gid = 1001;
-  joplin_data_volume = "${cfg.volumeDir}/data";
+  joplin_data_dir = "${cfg.volumeDir}/joplin/data";
   postgres_uid = 70;
   postgres_gid = 70;
-  postgres_data_volume = "${cfg.volumeDir}/postgresql/data";
+  postgres_data_dir = "${cfg.volumeDir}/postgres/data";
   cfg = config.modules.services.${service};
 in
 {
@@ -29,25 +30,25 @@ in
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.userName} - -"
-      "d ${joplin_data_volume} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
-      "d ${postgres_data_volume} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
+      "d ${joplin_data_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
+      "d ${postgres_data_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];
 
     sops.secrets."joplin/env" = { };
 
     services.${config.modules.services.reverse-proxy.service} = {
-      virtualHosts."${uri}".extraConfig = ''
-        reverse_proxy localhost:${toString port}
+      virtualHosts."${joplin_uri}".extraConfig = ''
+        reverse_proxy localhost:${toString joplin_port}
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ service ];
+    modules.services.dyndns-ovh.subdomains = [ joplin_subdomain ];
 
     # Containers
-    virtualisation.oci-containers.containers."joplin" = {
+    virtualisation.oci-containers.containers."joplin-joplin" = {
       image = "docker.io/joplin/server:latest";
       environment = {
-        "APP_BASE_URL" = "https://${uri}";
+        "APP_BASE_URL" = "https://${joplin_uri}";
         "APP_PORT" = "22300";
         "DB_CLIENT" = "pg";
         "POSTGRES_DATABASE" = "joplin";
@@ -59,10 +60,10 @@ in
         config.sops.secrets."joplin/env".path
       ];
       volumes = [
-        "${joplin_data_volume}:/data:rw"
+        "${joplin_data_dir}:/data:rw"
       ];
       ports = [
-        "${toString port}:22300/tcp"
+        "${toString joplin_port}:22300/tcp"
       ];
       labels = {
         "compose2nix.settings.sops.secrets" = "joplin/env";
@@ -77,7 +78,7 @@ in
         "--network=joplin"
       ];
     };
-    systemd.services."podman-joplin" = {
+    systemd.services."podman-joplin-joplin" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -103,7 +104,7 @@ in
         config.sops.secrets."joplin/env".path
       ];
       volumes = [
-        "${postgres_data_volume}:/var/lib/postgresql/data:rw"
+        "${postgres_data_dir}:/var/lib/postgresql/data:rw"
       ];
       labels = {
         "compose2nix.settings.sops.secrets" = "joplin/env";
@@ -111,7 +112,7 @@ in
       };
       log-driver = "journald";
       extraOptions = [
-        "--network-alias=joplin-postgres"
+        "--network-alias=postgres"
         "--network=joplin"
       ];
     };

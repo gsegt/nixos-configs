@@ -5,7 +5,7 @@ name: &name joplin
 
 services:
   joplin:
-    container_name: joplin
+    container_name: joplin-joplin
     image: docker.io/joplin/server:latest
     pull_policy: *pull_policy
     restart: *restart
@@ -18,16 +18,16 @@ services:
       - POSTGRES_HOST=joplin-postgres
       - STORAGE_DRIVER=Type=Filesystem; Path=/data
     volumes:
-      - /media/external/data-vault/services/joplin/data:/data
+      - /media/external/data-vault/services/joplin/joplin/data:/data
     ports:
       - 22300:22300
     depends_on:
-      - joplin-postgres
+      - postgres
     labels:
       - compose2nix.settings.sops.secrets=joplin/env
       - io.containers.autoupdate=registry
 
-  joplin-postgres:
+  postgres:
     container_name: joplin-postgres
     image: docker.io/library/postgres:16-alpine
     pull_policy: *pull_policy
@@ -35,7 +35,7 @@ services:
     environment:
       - POSTGRES_DB=joplin
     volumes:
-      - /media/external/data-vault/services/joplin/postgresql/data:/var/lib/postgresql/data
+      - /media/external/data-vault/services/joplin/postgres/data:/var/lib/postgresql/data
     labels:
       - compose2nix.settings.sops.secrets=joplin/env
       - io.containers.autoupdate=registry
