@@ -8,12 +8,14 @@
 let
   service = "opencloud";
   opencloud_port = 9200;
-  collabora_port = 9980;
-  opencloud_uri = "${service}.${config.modules.services.reverse-proxy.domain}";
-  collabora_uri = "collabora.${config.modules.services.reverse-proxy.domain}";
+  opencloud_subdomain = service;
+  opencloud_uri = "${opencloud_subdomain}.${config.modules.services.reverse-proxy.domain}";
   opencloud_data_dir = "${cfg.volumeDir}/data";
   opencloud_config_dir = "${cfg.volumeDir}/config";
   opencloud_ref_dir = "/etc/nixos/modules/services/opencloud/compose";
+  euro_office_port = 9900;
+  euro_office_subdomain = "euro-office";
+  euro_office_uri = "${euro_office_subdomain}.${config.modules.services.reverse-proxy.domain}";
   cfg = config.modules.services.${service};
 in
 {
@@ -30,7 +32,7 @@ in
       owner = config.modules.base.userName;
       group = config.modules.base.groupName;
     };
-    sops.secrets."opencloud/collabora/env" = {
+    sops.secrets."opencloud/euro-office/env" = {
       owner = config.modules.base.userName;
       group = config.modules.base.groupName;
     };
@@ -45,20 +47,20 @@ in
       virtualHosts."${opencloud_uri}".extraConfig = ''
         reverse_proxy localhost:${toString opencloud_port}
       '';
-      virtualHosts."${collabora_uri}".extraConfig = ''
-        reverse_proxy localhost:${toString collabora_port}
+      virtualHosts."${euro_office_uri}".extraConfig = ''
+        reverse_proxy localhost:${toString euro_office_port}
       '';
     };
 
     modules.services.dyndns-ovh.subdomains = [
-      service
-      "collabora"
+      opencloud_subdomain
+      euro_office_subdomain
     ];
 
     fileSystems."/usr/share/fonts/truetype" =
       let
         fontDir = pkgs.symlinkJoin {
-          name = "collabora-fonts";
+          name = "euro-office-fonts";
           paths = with pkgs; [
             corefonts
           ];
@@ -71,55 +73,29 @@ in
       };
 
     # Containers
-    virtualisation.oci-containers.containers."opencloud-collabora" = {
-      image = "docker.io/collabora/code:latest";
+    virtualisation.oci-containers.containers."opencloud-euro-office" = {
+      image = "ghcr.io/euro-office/documentserver:latest";
       environment = {
-        "DONT_GEN_SSL_CERT" = "YES";
-        "aliasgroup1" = "https://${opencloud_uri}";
-        "extra_params" =
-          "--o:ssl.enable=false \\
-            --o:ssl.ssl_verification=false \\
-            --o:ssl.termination=true \\
-            --o:welcome.enable=false \\
-            --o:net.frame_ancestors=${opencloud_uri} \\
-            --o:net.lok_allow.host[14]=${opencloud_uri} \\
-            --o:home_mode.enable=false
-          ";
-        "username" = "admin";
+        "USE_UNAUTHORIZED_STORAGE" = "false";
+        "WOPI_ENABLED" = "true";
       };
-      environmentFiles = [
-        config.sops.secrets."opencloud/collabora/env".path
-      ];
       volumes = [
-        "/usr/share/fonts/truetype:/opt/cool/systemplate/usr/share/fonts/truetype/more:ro"
+        "/usr/share/fonts/truetype:/usr/share/fonts/truetype/more:ro"
       ];
       ports = [
-        "127.0.0.1:${toString collabora_port}:9980/tcp"
+        "127.0.0.1:${toString euro_office_port}:80/tcp"
       ];
       labels = {
-        "compose2nix.settings.sops.secrets" = "opencloud/collabora/env";
+        "compose2nix.settings.sops.secrets" = "opencloud/euro-office/env";
         "io.containers.autoupdate" = "registry";
       };
-      cmd = [ "coolconfig generate-proof-key && /start-collabora-online.sh" ];
       log-driver = "journald";
       extraOptions = [
-        "--cap-add=SYS_ADMIN"
-        "--entrypoint=[\"/bin/bash\", \"-c\"]"
-        "--health-cmd=[\"bash\", \"-c\", \"exec 3<>/dev/tcp/127.0.0.1/9980 && printf 'GET /hosting/discovery HTTP/1.1
-    Host: localhost
-    Connection: close
-
-    ' >&3 && cat <&3 | head -1 | grep -q '200 OK'\"]"
-        "--health-interval=15s"
-        "--health-retries=5"
-        "--health-timeout=10s"
-        "--network-alias=collabora"
+        "--network-alias=euro-office"
         "--network=opencloud_opencloud-net"
-        "--security-opt=apparmor:unconfined"
-        "--security-opt=seccomp=unconfined"
       ];
     };
-    systemd.services."podman-opencloud-collabora" = {
+    systemd.services."podman-opencloud-euro-office" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -139,19 +115,18 @@ in
     virtualisation.oci-containers.containers."opencloud-opencloud" = {
       image = "docker.io/opencloudeu/opencloud-rolling:latest";
       environment = {
-        "COLLABORATION_APP_ADDR" = "https://${collabora_uri}";
-        "COLLABORATION_APP_ICON" = "https://${collabora_uri}/favicon.ico";
+        "COLLABORATION_APP_ADDR" = "https://${euro_office_uri}";
+        "COLLABORATION_APP_ICON" =
+          "https://${euro_office_uri}/web-apps/apps/documenteditor/main/resources/img/favicon.ico";
         "COLLABORATION_APP_INSECURE" = "true";
-        "COLLABORATION_APP_NAME" = "CollaboraOnline";
-        "COLLABORATION_APP_PRODUCT" = "Collabora";
+        "COLLABORATION_APP_NAME" = "Euro-Office";
+        "COLLABORATION_APP_PRODUCT" = "OnlyOffice";
+        "COLLABORATION_APP_PROOF_DISABLE" = "true";
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE" = "true";
         "COLLABORATION_WOPI_SRC" = "https://${opencloud_uri}";
-        "COLLABORA_DOMAIN" = collabora_uri;
-        "FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR" = "eu.opencloud.api.collaboration";
+        "EURO_OFFICE_DOMAIN" = euro_office_uri;
         "FRONTEND_ARCHIVER_MAX_SIZE" = "10000000000";
         "FRONTEND_CHECK_FOR_UPDATES" = "true";
-        "GRAPH_AVAILABLE_ROLES" =
-          "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6";
         "IDM_CREATE_DEMO_USERS" = "false";
         "NOTIFICATIONS_SMTP_AUTHENTICATION" = "";
         "NOTIFICATIONS_SMTP_ENCRYPTION" = "none";
@@ -187,6 +162,7 @@ in
         config.sops.secrets."opencloud/opencloud/env".path
       ];
       volumes = [
+        "${opencloud_ref_dir}/config/euro-office/app-registry.yaml:/etc/opencloud/app-registry.yaml:rw"
         "${opencloud_ref_dir}/config/opencloud/apps:/var/lib/opencloud/web/assets/apps:rw"
         "${opencloud_ref_dir}/config/opencloud/banned-password-list.txt:/etc/opencloud/banned-password-list.txt:rw"
         "${opencloud_ref_dir}/config/opencloud/csp.yaml:/etc/opencloud/csp.yaml:rw"
