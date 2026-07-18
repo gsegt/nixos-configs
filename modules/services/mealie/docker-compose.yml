@@ -2,15 +2,15 @@ name: &name mealie
 
 services:
   mealie:
-    container_name: mealie
+    container_name: *name
     image: ghcr.io/mealie-recipes/mealie:latest
     pull_policy: always
     restart: unless-stopped
     environment:
-      BASE_URL: https://mealie.gsegt.eu
-      PUID: 911
-      PGID: 911
-      TZ: Europe/Paris
+      - BASE_URL=https://mealie.gsegt.eu
+      - PUID=911
+      - PGID=911
+      - TZ=Europe/Paris
     volumes:
       - /media/external/data-vault/services/mealie/data:/app/data/
     ports:
