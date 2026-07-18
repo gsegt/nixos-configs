@@ -9,6 +9,7 @@ services:
       - /media/external/data-vault/services/radicale/data:/var/lib/radicale
       - /run/secrets/radicale/htpasswd:/run/secrets/radicale/htpasswd:ro
       - /etc/nixos/modules/services/radicale/config:/etc/radicale/config:ro
+      - /etc/nixos/modules/services/radicale/create_birthday_calendar.py:/usr/local/bin/create_birthday_calendar.py:ro # Script adapted from https://github.com/iBigQ/radicale-birthday-calendar
     ports:
       - 5232:5232
     labels:

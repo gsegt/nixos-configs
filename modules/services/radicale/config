@@ -4,3 +4,6 @@ htpasswd_filename = /run/secrets/radicale/htpasswd
 
 [headers]
 content-security-policy = default-src 'self'; object-src 'none'
+
+[storage]
+hook = /app/bin/python /usr/local/bin/create_birthday_calendar.py %(path)s

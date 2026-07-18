@@ -53,6 +53,7 @@ in
       image = "docker.io/kozea/radicale:latest";
       volumes = [
         "${ref_dir}/config:/etc/radicale/config:ro"
+        "${ref_dir}/create_birthday_calendar.py:/usr/local/bin/create_birthday_calendar.py:ro"
         "${data_dir}:/var/lib/radicale:rw"
         "${config.sops.secrets."radicale/htpasswd".path}:${config.sops.secrets."radicale/htpasswd".path}:ro"
       ];
