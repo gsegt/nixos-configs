@@ -8,10 +8,11 @@
 let
   service = "mealie";
   port = 9000;
-  uri = "${service}.${config.modules.services.reverse-proxy.domain}";
-  mealie_uid = 911;
-  mealie_gid = 911;
-  mealie_data_volume = "${cfg.volumeDir}/data";
+  subdomain = service;
+  uri = "${subdomain}.${config.modules.services.reverse-proxy.domain}";
+  uid = 911;
+  gid = 911;
+  data_dir = "${cfg.volumeDir}/data";
   cfg = config.modules.services.${service};
 in
 {
@@ -26,7 +27,7 @@ in
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${mealie_data_volume} 0755 ${toString mealie_uid} ${toString mealie_gid} - -"
+      "d ${data_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -35,19 +36,19 @@ in
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ service ];
+    modules.services.dyndns-ovh.subdomains = [ subdomain ];
 
     # Containers
     virtualisation.oci-containers.containers."mealie" = {
       image = "ghcr.io/mealie-recipes/mealie:latest";
       environment = {
         "BASE_URL" = "https://${uri}";
-        "PGID" = toString mealie_gid;
-        "PUID" = toString mealie_uid;
+        "PGID" = toString gid;
+        "PUID" = toString uid;
         "TZ" = config.time.timeZone;
       };
       volumes = [
-        "${mealie_data_volume}:/app/data:rw"
+        "${data_dir}:/app/data:rw"
       ];
       ports = [
         "${toString port}:9000/tcp"
