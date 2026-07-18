@@ -1,0 +1,6 @@
+[auth]
+type = htpasswd
+htpasswd_filename = /run/secrets/radicale/htpasswd
+
+[headers]
+content-security-policy = default-src 'self'; object-src 'none'

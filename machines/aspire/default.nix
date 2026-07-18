@@ -69,7 +69,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/opencloud";
     };
-    radicale.enable = true;
+    radicale = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/radicale";
+    };
     reverse-proxy.enable = true;
     vaultwarden = {
       enable = true;

@@ -1,0 +1,21 @@
+name: &name radicale
+
+services:
+  radicale:
+    container_name: *name
+    image: docker.io/kozea/radicale:latest
+    restart: unless-stopped
+    volumes:
+      - /media/external/data-vault/services/radicale/data:/var/lib/radicale
+      - /run/secrets/radicale/htpasswd:/run/secrets/radicale/htpasswd:ro
+      - /etc/nixos/modules/services/radicale/config:/etc/radicale/config:ro
+    ports:
+      - 5232:5232
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/radicale/docker-compose.yml -output modules/services/radicale/default-debug.nix
