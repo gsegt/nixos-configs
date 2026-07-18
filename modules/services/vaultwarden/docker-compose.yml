@@ -1,0 +1,29 @@
+name: &name vaultwarden
+
+services:
+  vaultwarden:
+    container_name: *name
+    image: docker.io/vaultwarden/server:latest
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+     - DOMAIN=https://vaultwarden.gsegt.eu
+     - SIGNUPS_ALLOWED=false
+     - SMTP_FROM=vaultwarden@gsegt.eu
+     - SMTP_HOST=smtp.mail.ovh.net
+     - SMTP_PORT=587
+     - SMTP_SECURITY=starttls
+     - SMTP_USERNAME=mail@gsegt.eu
+    volumes:
+     - /media/external/data-vault/services/vaultwarden/data:/data
+    ports:
+     - 8000:80
+    labels:
+      - compose2nix.settings.sops.secrets=vaultwarden/env
+      - io.containers.autoupdate=registry
+
+networks:
+ default:
+   name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/vaultwarden/docker-compose.yml -output modules/services/vaultwarden/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/vaultwarden/default-debug.nix

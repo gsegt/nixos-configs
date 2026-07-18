@@ -73,7 +73,7 @@ in
     reverse-proxy.enable = true;
     vaultwarden = {
       enable = true;
-      backupDir = "${baseServicesDir}/vaultwarden";
+      volumeDir = "${baseServicesDir}/vaultwarden";
     };
   };
 
