@@ -49,7 +49,7 @@ in
     dyndns-ovh.enable = true;
     immich = {
       enable = true;
-      mediaDir = "${baseServicesDir}/immich";
+      volumeDir = "${baseServicesDir}/immich";
     };
     joplin = {
       enable = true;
