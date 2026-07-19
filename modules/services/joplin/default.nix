@@ -28,13 +28,13 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    sops.secrets."joplin/env" = { };
+
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
       "d ${joplin_data_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
       "d ${postgres_data_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];
-
-    sops.secrets."joplin/env" = { };
 
     services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${joplin_uri}".extraConfig = ''

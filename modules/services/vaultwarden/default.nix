@@ -25,12 +25,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    sops.secrets."vaultwarden/env" = { };
+
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
       "d ${data_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
-
-    sops.secrets."vaultwarden/env" = { };
 
     services.${config.modules.services.reverse-proxy.service} = {
       virtualHosts."${uri}".extraConfig = ''
