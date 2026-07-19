@@ -21,6 +21,7 @@ in
     uid = 1000;
     gid = config.modules.base.uid;
     hostName = "aspire";
+    timeZone = "Europe/Paris";
   };
 
   modules.boot = {

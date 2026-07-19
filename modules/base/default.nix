@@ -42,7 +42,6 @@ in
 
     timeZone = lib.mkOption {
       type = lib.types.str;
-      default = "Europe/Paris";
       description = "Timezone of the current system.";
     };
   };
