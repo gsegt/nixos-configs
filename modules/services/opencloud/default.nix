@@ -10,6 +10,8 @@ let
   opencloud_port = 9200;
   opencloud_subdomain = service;
   opencloud_uri = "${opencloud_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  opencloud_uid = 1000;
+  opencloud_gid = 1000;
   opencloud_data_dir = "${cfg.volumeDir}/data";
   opencloud_config_dir = "${cfg.volumeDir}/config";
   opencloud_ref_dir = "/etc/nixos/modules/services/opencloud/compose";
@@ -28,19 +30,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."opencloud/opencloud/env" = {
-      owner = config.modules.base.userName;
-      group = config.modules.base.groupName;
-    };
-    sops.secrets."opencloud/euro-office/env" = {
-      owner = config.modules.base.userName;
-      group = config.modules.base.groupName;
+    sops.secrets = {
+      "opencloud/opencloud/env" = { };
+      "opencloud/euro-office/env" = { };
     };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${opencloud_data_dir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${opencloud_config_dir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
+      "d ${opencloud_data_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
+      "d ${opencloud_config_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
