@@ -12,10 +12,12 @@ let
   joplin_uri = "${joplin_subdomain}.${config.modules.services.reverse-proxy.domain}";
   joplin_uid = 1001;
   joplin_gid = 1001;
-  joplin_data_dir = "${cfg.volumeDir}/joplin/data";
+  joplin_volume_dir = "${cfg.volumeDir}/joplin";
+  joplin_data_dir = "${joplin_volume_dir}/data";
   postgres_uid = 70;
   postgres_gid = 70;
-  postgres_data_dir = "${cfg.volumeDir}/postgres/data";
+  postgres_volume_dir = "${cfg.volumeDir}/postgres";
+  postgres_data_dir = "${postgres_volume_dir}/data";
   cfg = config.modules.services.${service};
 in
 {
@@ -32,7 +34,9 @@ in
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
+      "d ${joplin_volume_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
       "d ${joplin_data_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
+      "d ${postgres_volume_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
       "d ${postgres_data_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];
 

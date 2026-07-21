@@ -12,10 +12,12 @@ let
   server_uri = "${server_subdomain}.${config.modules.services.reverse-proxy.domain}";
   server_uid = 0;
   server_gid = 0;
-  server_data_dir = "${cfg.volumeDir}/server/data";
+  server_volume_dir = "${cfg.volumeDir}/server";
+  server_data_dir = "${server_volume_dir}/data";
   postgres_uid = 999;
   postgres_gid = 999;
-  postgres_data_dir = "${cfg.volumeDir}/postgres/data";
+  postgres_volume_dir = "${cfg.volumeDir}/postgres";
+  postgres_data_dir = "${postgres_volume_dir}/data";
   cfg = config.modules.services.${service};
 in
 {
@@ -35,7 +37,9 @@ in
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
+      "d ${server_volume_dir} 0755 ${toString server_uid} ${toString server_gid} - -"
       "d ${server_data_dir} 0755 ${toString server_uid} ${toString server_gid} - -"
+      "d ${postgres_volume_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
       "d ${postgres_data_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];
 
