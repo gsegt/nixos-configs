@@ -61,7 +61,7 @@ in
     };
     media-server = {
       enable = true;
-      baseDir = "${baseServicesDir}/media-server";
+      volumeDir = "${baseServicesDir}/media-server";
       subnetWhitelist = "192.168.1.0/24";
       torrentingPort = 47563;
     };

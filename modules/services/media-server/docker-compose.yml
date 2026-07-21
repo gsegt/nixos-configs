@@ -1,0 +1,33 @@
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+x-puid: &puid PUID=1000
+x-pgid: &pgid PGID=1000
+x-tz: &tz TZ=Europe/Paris
+x-data: &data "/media/external/data-vault/services/media-server:/data"
+x-media: &media "/media/external/data-vault/services/media-server/media:/data/media"
+x-torrents: &torrents "/media/external/data-vault/services/media-server/torrents:/data/torrents"
+
+name: &name media-server
+
+services:
+  clonarr:
+    container_name: media-server-clonarr
+    image: ghcr.io/prophetse7en/clonarr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 6060:6060
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+    volumes:
+      - /media/external/data-vault/services/media-server/clonarr/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/media-server/docker-compose.yml -output modules/services/media-server/default-debug.nix
