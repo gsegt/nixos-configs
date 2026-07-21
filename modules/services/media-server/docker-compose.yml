@@ -10,6 +10,23 @@ x-torrents: &torrents "/media/external/data-vault/services/media-server/torrents
 name: &name media-server
 
 services:
+  bazarr:
+    container_name: media-server-bazarr
+    image: lscr.io/linuxserver/bazarr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 6767:6767
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+    volumes:
+      - *media
+      - /media/external/data-vault/services/media-server/bazarr/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
   clonarr:
     container_name: media-server-clonarr
     image: ghcr.io/prophetse7en/clonarr:latest

@@ -11,6 +11,9 @@ let
   uid = config.modules.base.uid;
   gid = config.modules.base.gid;
   timezone = config.modules.base.timeZone;
+  bazarr_port = 6767;
+  bazarr_volume_dir = "${cfg.volumeDir}/bazarr";
+  bazarr_config_dir = "${bazarr_volume_dir}/config";
   clonarr_port = 6060;
   clonarr_volume_dir = "${cfg.volumeDir}/clonarr";
   clonarr_config_dir = "${clonarr_volume_dir}/config";
@@ -38,7 +41,6 @@ in
 
   config = lib.mkIf cfg.enable {
     modules.services.media-server = {
-      bazarr.enable = true;
       cross-seed.enable = true;
       filebrowser = {
         enable = true;
@@ -63,13 +65,58 @@ in
       "d ${cfg.volumeDir} 0755 ${toString uid} ${toString gid} - -"
       "d ${media_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${torrents_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${bazarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${bazarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
 
-    networking.firewall.allowedTCPPorts = [ clonarr_port ];
+    networking.firewall.allowedTCPPorts = [
+      bazarr_port
+      clonarr_port
+    ];
 
     # Containers
+    virtualisation.oci-containers.containers."media-server-bazarr" = {
+      image = "lscr.io/linuxserver/bazarr:latest";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${bazarr_config_dir}:/config:rw"
+        "${media_dir}:/data/media:rw"
+      ];
+      ports = [
+        "${toString bazarr_port}:6767/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=bazarr"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-bazarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
     virtualisation.oci-containers.containers."media-server-clonarr" = {
       image = "ghcr.io/prophetse7en/clonarr:latest";
       environment = {
