@@ -3,7 +3,8 @@ name: &name radicale
 services:
   radicale:
     container_name: *name
-    image: docker.io/kozea/radicale:latest
+    image: docker.io/kozea/radicale:stable
+    pull_policy: always
     restart: unless-stopped
     volumes:
       - /media/external/data-vault/services/radicale/data:/var/lib/radicale

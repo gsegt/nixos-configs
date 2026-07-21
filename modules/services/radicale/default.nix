@@ -50,7 +50,7 @@ in
 
     # Containers
     virtualisation.oci-containers.containers."radicale" = {
-      image = "docker.io/kozea/radicale:latest";
+      image = "docker.io/kozea/radicale:stable";
       volumes = [
         "${ref_dir}/config:/etc/radicale/config:ro"
         "${ref_dir}/create_birthday_calendar.py:/usr/local/bin/create_birthday_calendar.py:ro"
