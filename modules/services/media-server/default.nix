@@ -11,6 +11,7 @@ let
   uid = config.modules.base.uid;
   gid = config.modules.base.gid;
   timezone = config.modules.base.timeZone;
+  data_dir = "${cfg.volumeDir}";
   bazarr_port = 6767;
   bazarr_volume_dir = "${cfg.volumeDir}/bazarr";
   bazarr_config_dir = "${bazarr_volume_dir}/config";
@@ -20,6 +21,9 @@ let
   prowlarr_port = 9696;
   prowlarr_volume_dir = "${cfg.volumeDir}/prowlarr";
   prowlarr_config_dir = "${prowlarr_volume_dir}/config";
+  radarr_port = 7878;
+  radarr_volume_dir = "${cfg.volumeDir}/radarr";
+  radarr_config_dir = "${radarr_volume_dir}/config";
   utils = import ../../../utils;
   cfg = config.modules.services.media-server;
 in
@@ -51,7 +55,6 @@ in
       };
       flaresolverr.enable = true;
       jellyfin.enable = true;
-      radarr.enable = true;
       seerr.enable = true;
       sonarr.enable = true;
       torrent-downloader = {
@@ -73,12 +76,15 @@ in
       "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${radarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
       bazarr_port
       clonarr_port
       prowlarr_port
+      radarr_port
     ];
 
     # Containers
@@ -184,6 +190,46 @@ in
       ];
     };
     systemd.services."podman-media-server-prowlarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-radarr" = {
+      image = "lscr.io/linuxserver/radarr:latest";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${data_dir}:/data:rw"
+        "${radarr_config_dir}:/config:rw"
+      ];
+      ports = [
+        "${toString radarr_port}:7878/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=radarr"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-radarr" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };

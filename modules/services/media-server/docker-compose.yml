@@ -59,6 +59,23 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  radarr:
+    container_name: media-server-radarr
+    image: lscr.io/linuxserver/radarr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 7878:7878
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+    volumes:
+      - *data
+      - /media/external/data-vault/services/media-server/radarr/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
 networks:
   default:
     name: *name
