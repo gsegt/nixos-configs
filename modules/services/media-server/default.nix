@@ -17,6 +17,9 @@ let
   clonarr_port = 6060;
   clonarr_volume_dir = "${cfg.volumeDir}/clonarr";
   clonarr_config_dir = "${clonarr_volume_dir}/config";
+  prowlarr_port = 9696;
+  prowlarr_volume_dir = "${cfg.volumeDir}/prowlarr";
+  prowlarr_config_dir = "${prowlarr_volume_dir}/config";
   utils = import ../../../utils;
   cfg = config.modules.services.media-server;
 in
@@ -48,7 +51,6 @@ in
       };
       flaresolverr.enable = true;
       jellyfin.enable = true;
-      prowlarr.enable = true;
       radarr.enable = true;
       seerr.enable = true;
       sonarr.enable = true;
@@ -69,11 +71,14 @@ in
       "d ${bazarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
       bazarr_port
       clonarr_port
+      prowlarr_port
     ];
 
     # Containers
@@ -140,6 +145,45 @@ in
       ];
     };
     systemd.services."podman-media-server-clonarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-prowlarr" = {
+      image = "lscr.io/linuxserver/prowlarr:latest";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${prowlarr_config_dir}:/config:rw"
+      ];
+      ports = [
+        "${toString prowlarr_port}:9696/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=prowlarr"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-prowlarr" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };

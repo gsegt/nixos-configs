@@ -43,6 +43,22 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  prowlarr:
+    container_name: media-server-prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 9696:9696
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+    volumes:
+      - /media/external/data-vault/services/media-server/prowlarr/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
 networks:
   default:
     name: *name
