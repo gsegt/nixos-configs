@@ -76,6 +76,23 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  sonarr:
+    container_name: media-server-sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 8989:8989
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+    volumes:
+      - *data
+      - /media/external/data-vault/services/media-server/sonarr/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
 networks:
   default:
     name: *name

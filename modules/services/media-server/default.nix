@@ -24,6 +24,9 @@ let
   radarr_port = 7878;
   radarr_volume_dir = "${cfg.volumeDir}/radarr";
   radarr_config_dir = "${radarr_volume_dir}/config";
+  sonarr_port = 8989;
+  sonarr_volume_dir = "${cfg.volumeDir}/sonarr";
+  sonarr_config_dir = "${sonarr_volume_dir}/config";
   utils = import ../../../utils;
   cfg = config.modules.services.media-server;
 in
@@ -56,7 +59,6 @@ in
       flaresolverr.enable = true;
       jellyfin.enable = true;
       seerr.enable = true;
-      sonarr.enable = true;
       torrent-downloader = {
         enable = true;
         savePath = "${torrents_dir}";
@@ -78,6 +80,8 @@ in
       "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${sonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${sonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
@@ -85,6 +89,7 @@ in
       clonarr_port
       prowlarr_port
       radarr_port
+      sonarr_port
     ];
 
     # Containers
@@ -230,6 +235,46 @@ in
       ];
     };
     systemd.services."podman-media-server-radarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-sonarr" = {
+      image = "lscr.io/linuxserver/sonarr:latest";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${data_dir}:/data:rw"
+        "${sonarr_config_dir}:/config:rw"
+      ];
+      ports = [
+        "${toString sonarr_port}:8989/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=sonarr"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-sonarr" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
