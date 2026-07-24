@@ -122,6 +122,21 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  seerr:
+    container_name: media-server-seerr
+    image: docker.io/seerr/seerr:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 5055:5055
+    environment:
+      - *tz
+    volumes:
+      - /media/external/data-vault/services/media-server/seerr/config:/app/config
+    labels:
+      - io.containers.autoupdate=registry
+    init: true
+
   sonarr:
     container_name: media-server-sonarr
     image: lscr.io/linuxserver/sonarr:latest

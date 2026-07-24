@@ -29,6 +29,13 @@ let
   radarr_port = 7878;
   radarr_volume_dir = "${cfg.volumeDir}/radarr";
   radarr_config_dir = "${radarr_volume_dir}/config";
+  seerr_port = 5055;
+  seerr_subdomain = "seerr";
+  seerr_uri = "${seerr_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  seerr_uid = 1000;
+  seerr_gid = 1000;
+  seerr_volume_dir = "${cfg.volumeDir}/seerr";
+  seerr_config_dir = "${seerr_volume_dir}/config";
   sonarr_port = 8989;
   sonarr_volume_dir = "${cfg.volumeDir}/sonarr";
   sonarr_config_dir = "${sonarr_volume_dir}/config";
@@ -58,7 +65,6 @@ in
       };
       flaresolverr.enable = true;
       jellyfin.enable = true;
-      seerr.enable = true;
     };
 
     sops.secrets."media-server/gluetun/env" = { };
@@ -79,6 +85,8 @@ in
       "d ${qbittorrent_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${seerr_volume_dir} 0755 ${toString seerr_uid} ${toString seerr_gid} - -"
+      "d ${seerr_config_dir} 0755 ${toString seerr_uid} ${toString seerr_gid} - -"
       "d ${sonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${sonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
     ];
@@ -91,6 +99,14 @@ in
       radarr_port
       sonarr_port
     ];
+
+    services.${config.modules.services.reverse-proxy.service} = {
+      virtualHosts."${seerr_uri}".extraConfig = ''
+        reverse_proxy localhost:${toString seerr_port}
+      '';
+    };
+
+    modules.services.dyndns-ovh.subdomains = [ seerr_subdomain ];
 
     # Containers
     virtualisation.oci-containers.containers."media-server-bazarr" = {
@@ -322,6 +338,43 @@ in
       ];
     };
     systemd.services."podman-media-server-radarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-seerr" = {
+      image = "docker.io/seerr/seerr:latest";
+      environment = {
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${seerr_config_dir}:/app/config:rw"
+      ];
+      ports = [
+        "${toString seerr_port}:5055/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=seerr"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-seerr" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
