@@ -6,12 +6,12 @@
 }:
 
 let
+  data_dir = "${cfg.volumeDir}";
   media_dir = "${cfg.volumeDir}/media";
   torrents_dir = "${cfg.volumeDir}/torrents";
   uid = config.modules.base.uid;
   gid = config.modules.base.gid;
   timezone = config.modules.base.timeZone;
-  data_dir = "${cfg.volumeDir}";
   bazarr_port = 6767;
   bazarr_volume_dir = "${cfg.volumeDir}/bazarr";
   bazarr_config_dir = "${bazarr_volume_dir}/config";
@@ -65,7 +65,7 @@ in
     sops.secrets."media-server/gluetun/env" = { };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.volumeDir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${data_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${media_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${torrents_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${bazarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
