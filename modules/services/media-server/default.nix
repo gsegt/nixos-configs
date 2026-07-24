@@ -18,9 +18,14 @@ let
   clonarr_port = 6060;
   clonarr_volume_dir = "${cfg.volumeDir}/clonarr";
   clonarr_config_dir = "${clonarr_volume_dir}/config";
+  gluetun_volume_dir = "${cfg.volumeDir}/gluetun";
+  gluetun_gluetun_dir = "${gluetun_volume_dir}/gluetun";
   prowlarr_port = 9696;
   prowlarr_volume_dir = "${cfg.volumeDir}/prowlarr";
   prowlarr_config_dir = "${prowlarr_volume_dir}/config";
+  qbittorrent_port = 8080;
+  qbittorrent_volume_dir = "${cfg.volumeDir}/qbittorrent";
+  qbittorrent_config_dir = "${qbittorrent_volume_dir}/config";
   radarr_port = 7878;
   radarr_volume_dir = "${cfg.volumeDir}/radarr";
   radarr_config_dir = "${radarr_volume_dir}/config";
@@ -40,10 +45,6 @@ in
       type = lib.types.path;
     };
 
-    subnetWhitelist = lib.mkOption {
-      type = lib.types.str;
-    };
-
     torrentingPort = lib.mkOption {
       type = lib.types.int;
     };
@@ -59,14 +60,9 @@ in
       flaresolverr.enable = true;
       jellyfin.enable = true;
       seerr.enable = true;
-      torrent-downloader = {
-        enable = true;
-        savePath = "${torrents_dir}";
-        subnetWhitelist = cfg.subnetWhitelist;
-        torrentingPort = cfg.torrentingPort;
-      };
-      wireguard-netns.enable = true;
     };
+
+    sops.secrets."media-server/gluetun/env" = { };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${toString uid} ${toString gid} - -"
@@ -76,8 +72,12 @@ in
       "d ${bazarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${gluetun_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${gluetun_gluetun_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${qbittorrent_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${qbittorrent_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${sonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
@@ -88,6 +88,7 @@ in
       bazarr_port
       clonarr_port
       prowlarr_port
+      qbittorrent_port
       radarr_port
       sonarr_port
     ];
@@ -172,6 +173,57 @@ in
         "podman-compose-media-server-root.target"
       ];
     };
+    virtualisation.oci-containers.containers."media-server-gluetun" = {
+      image = "docker.io/qmcgaw/gluetun:v3";
+      environment = {
+        "FIREWALL_VPN_INPUT_PORTS" = toString cfg.torrentingPort;
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "SERVER_COUNTRIES" = "Netherlands";
+        "TZ" = timezone;
+        "UPDATER_PERIOD" = "480h";
+        "VPN_SERVICE_PROVIDER" = "airvpn";
+        "VPN_TYPE" = "wireguard";
+      };
+      environmentFiles = [
+        config.sops.secrets."media-server/gluetun/env".path
+      ];
+      volumes = [
+        "${gluetun_gluetun_dir}:/gluetun:rw"
+      ];
+      ports = [
+        "${toString qbittorrent_port}:${toString qbittorrent_port}/tcp"
+      ];
+      labels = {
+        "compose2nix.settings.sops.secrets" = "media-server/gluetun/env";
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--cap-add=NET_ADMIN"
+        "--cap-add=NET_RAW"
+        "--device=/dev/net/tun:/dev/net/tun:rwm"
+        "--network-alias=gluetun"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-gluetun" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
     virtualisation.oci-containers.containers."media-server-prowlarr" = {
       image = "lscr.io/linuxserver/prowlarr:latest";
       environment = {
@@ -204,6 +256,42 @@ in
       requires = [
         "podman-network-media-server.service"
       ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-qbittorrent" = {
+      image = "lscr.io/linuxserver/qbittorrent:latest";
+      environment = {
+        "DOCKER_MODS" = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TORRENTING_PORT" = toString cfg.torrentingPort;
+        "TZ" = timezone;
+        "WEBUI_PORT" = toString qbittorrent_port;
+      };
+      volumes = [
+        "${qbittorrent_config_dir}:/config:rw"
+        "${torrents_dir}:/data/torrents:rw"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      dependsOn = [
+        "media-server-gluetun"
+      ];
+      log-driver = "journald";
+      extraOptions = [
+        "--network=container:media-server-gluetun"
+      ];
+    };
+    systemd.services."podman-media-server-qbittorrent" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
       partOf = [
         "podman-compose-media-server-root.target"
       ];

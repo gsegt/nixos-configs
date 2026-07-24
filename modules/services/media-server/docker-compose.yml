@@ -43,6 +43,33 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  gluetun:
+    image: docker.io/qmcgaw/gluetun:v3
+    container_name: media-server-gluetun
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+      - VPN_SERVICE_PROVIDER=airvpn
+      - VPN_TYPE=wireguard
+      - SERVER_COUNTRIES=Netherlands
+      - FIREWALL_VPN_INPUT_PORTS=47563
+      - UPDATER_PERIOD=480h
+    ports:
+      - 8080:8080 # qBittorrent webui
+    volumes:
+      - /media/external/data-vault/services/media-server/gluetun/gluetun:/gluetun
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    labels:
+      - compose2nix.settings.sops.secrets=media-server/gluetun/env
+      - io.containers.autoupdate=registry
+
   prowlarr:
     container_name: media-server-prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
@@ -58,6 +85,25 @@ services:
       - /media/external/data-vault/services/media-server/prowlarr/config:/config
     labels:
       - io.containers.autoupdate=registry
+
+  qbittorrent:
+    container_name: media-server-qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=47563
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+    volumes:
+      - *torrents
+      - /media/external/data-vault/services/media-server/qbittorrent/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+    network_mode: "service:gluetun"
 
   radarr:
     container_name: media-server-radarr
@@ -97,4 +143,4 @@ networks:
   default:
     name: *name
 
-# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/media-server/docker-compose.yml -output modules/services/media-server/default-debug.nix
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/media-server/docker-compose.yml -output modules/services/media-server/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/media-server/default-debug.nix
