@@ -63,7 +63,6 @@ in
         enable = true;
         rootDir = "${media_dir}";
       };
-      flaresolverr.enable = true;
       jellyfin.enable = true;
     };
 
