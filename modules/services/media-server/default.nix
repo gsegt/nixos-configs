@@ -18,6 +18,12 @@ let
   clonarr_port = 6060;
   clonarr_volume_dir = "${cfg.volumeDir}/clonarr";
   clonarr_config_dir = "${clonarr_volume_dir}/config";
+  filebrowser_port = 8082;
+  filebrowser_subdomain = "filebrowser";
+  filebrowser_uri = "${filebrowser_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  filebrowser_volume_dir = "${cfg.volumeDir}/filebrowser";
+  filebrowser_config_dir = "${filebrowser_volume_dir}/config";
+  filebrowser_database_dir = "${filebrowser_volume_dir}/database";
   gluetun_volume_dir = "${cfg.volumeDir}/gluetun";
   gluetun_gluetun_dir = "${gluetun_volume_dir}/gluetun";
   prowlarr_port = 9696;
@@ -59,10 +65,6 @@ in
 
   config = lib.mkIf cfg.enable {
     modules.services.media-server = {
-      filebrowser = {
-        enable = true;
-        rootDir = "${media_dir}";
-      };
       jellyfin.enable = true;
     };
 
@@ -76,6 +78,9 @@ in
       "d ${bazarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${filebrowser_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${filebrowser_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${filebrowser_database_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${gluetun_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${gluetun_gluetun_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
@@ -100,12 +105,19 @@ in
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
+      virtualHosts."${filebrowser_uri}".extraConfig = ''
+        reverse_proxy localhost:${toString filebrowser_port}
+      '';
+
       virtualHosts."${seerr_uri}".extraConfig = ''
         reverse_proxy localhost:${toString seerr_port}
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ seerr_subdomain ];
+    modules.services.dyndns-ovh.subdomains = [
+      filebrowser_subdomain
+      seerr_subdomain
+    ];
 
     # Containers
     virtualisation.oci-containers.containers."media-server-bazarr" = {
@@ -171,6 +183,46 @@ in
       ];
     };
     systemd.services."podman-media-server-clonarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-filebrowser" = {
+      image = "docker.io/filebrowser/filebrowser:s6";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+      };
+      volumes = [
+        "${media_dir}:/srv:rw"
+        "${filebrowser_config_dir}:/config:rw"
+        "${filebrowser_database_dir}:/database:rw"
+      ];
+      ports = [
+        "${toString filebrowser_port}:80/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=filebrowser"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-filebrowser" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };

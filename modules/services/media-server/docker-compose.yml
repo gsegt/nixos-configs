@@ -43,6 +43,23 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  filebrowser:
+    container_name: media-server-filebrowser
+    image: docker.io/filebrowser/filebrowser:s6
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 8082:80
+    environment:
+      - *puid
+      - *pgid
+    volumes:
+      - /media/external/data-vault/services/media-server/media:/srv
+      - /media/external/data-vault/services/media-server/filebrowser/database:/database
+      - /media/external/data-vault/services/media-server/filebrowser/config:/config
+    labels:
+      - io.containers.autoupdate=registry
+
   gluetun:
     image: docker.io/qmcgaw/gluetun:v3
     container_name: media-server-gluetun
