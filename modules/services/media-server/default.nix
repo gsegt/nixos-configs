@@ -52,7 +52,6 @@ in
 
   config = lib.mkIf cfg.enable {
     modules.services.media-server = {
-      cross-seed.enable = true;
       filebrowser = {
         enable = true;
         rootDir = "${media_dir}";
