@@ -4,8 +4,8 @@ x-puid: &puid PUID=1000
 x-pgid: &pgid PGID=1000
 x-tz: &tz TZ=Europe/Paris
 x-data: &data "/media/external/data-vault/services/media-server:/data"
-x-media: &media "/media/external/data-vault/services/media-server/media:/data/media"
-x-torrents: &torrents "/media/external/data-vault/services/media-server/torrents:/data/torrents"
+x-media: &media "/media/external/data-vault/services/media-server/data/media:/data/media"
+x-torrents: &torrents "/media/external/data-vault/services/media-server/data/torrents:/data/torrents"
 
 name: &name media-server
 
@@ -54,7 +54,7 @@ services:
       - *puid
       - *pgid
     volumes:
-      - /media/external/data-vault/services/media-server/media:/srv
+      - /media/external/data-vault/services/media-server/data/media:/srv
       - /media/external/data-vault/services/media-server/filebrowser/database:/database
       - /media/external/data-vault/services/media-server/filebrowser/config:/config
     labels:

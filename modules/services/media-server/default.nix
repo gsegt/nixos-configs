@@ -6,9 +6,9 @@
 }:
 
 let
-  data_dir = "${cfg.volumeDir}";
-  media_dir = "${cfg.volumeDir}/media";
-  torrents_dir = "${cfg.volumeDir}/torrents";
+  data_dir = "${cfg.volumeDir}/data";
+  media_dir = "${data_dir}/media";
+  torrents_dir = "${data_dir}/torrents";
   uid = config.modules.base.uid;
   gid = config.modules.base.gid;
   timezone = config.modules.base.timeZone;
