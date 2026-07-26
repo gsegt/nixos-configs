@@ -87,6 +87,26 @@ services:
       - compose2nix.settings.sops.secrets=media-server/gluetun/env
       - io.containers.autoupdate=registry
 
+  jellyfin:
+    container_name: media-server-jellyfin
+    image: lscr.io/linuxserver/jellyfin:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 8096:8096
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    volumes:
+      - *media
+      - /media/external/data-vault/services/media-server/jellyfin/config:/config
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - io.containers.autoupdate=registry
+
   prowlarr:
     container_name: media-server-prowlarr
     image: lscr.io/linuxserver/prowlarr:latest

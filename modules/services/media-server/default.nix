@@ -26,6 +26,11 @@ let
   filebrowser_database_dir = "${filebrowser_volume_dir}/database";
   gluetun_volume_dir = "${cfg.volumeDir}/gluetun";
   gluetun_gluetun_dir = "${gluetun_volume_dir}/gluetun";
+  jellyfin_port = 8096;
+  jellyfin_subdomain = "jellyfin";
+  jellyfin_uri = "${jellyfin_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  jellyfin_volume_dir = "${cfg.volumeDir}/jellyfin";
+  jellyfin_config_dir = "${jellyfin_volume_dir}/config";
   prowlarr_port = 9696;
   prowlarr_volume_dir = "${cfg.volumeDir}/prowlarr";
   prowlarr_config_dir = "${prowlarr_volume_dir}/config";
@@ -64,10 +69,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    modules.services.media-server = {
-      jellyfin.enable = true;
-    };
-
     sops.secrets."media-server/gluetun/env" = { };
 
     systemd.tmpfiles.rules = [
@@ -83,6 +84,8 @@ in
       "d ${filebrowser_database_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${gluetun_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${gluetun_gluetun_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${jellyfin_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${jellyfin_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${qbittorrent_volume_dir} 0755 ${toString uid} ${toString gid} - -"
@@ -109,6 +112,10 @@ in
         reverse_proxy localhost:${toString filebrowser_port}
       '';
 
+      virtualHosts."${jellyfin_uri}".extraConfig = ''
+        reverse_proxy localhost:${toString jellyfin_port}
+      '';
+
       virtualHosts."${seerr_uri}".extraConfig = ''
         reverse_proxy localhost:${toString seerr_port}
       '';
@@ -116,6 +123,7 @@ in
 
     modules.services.dyndns-ovh.subdomains = [
       filebrowser_subdomain
+      jellyfin_subdomain
       seerr_subdomain
     ];
 
@@ -274,6 +282,48 @@ in
       ];
     };
     systemd.services."podman-media-server-gluetun" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-jellyfin" = {
+      image = "lscr.io/linuxserver/jellyfin:latest";
+      environment = {
+        "DOCKER_MODS" = "linuxserver/mods:jellyfin-opencl-intel";
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${jellyfin_config_dir}:/config:rw"
+        "${media_dir}:/data/media:rw"
+      ];
+      ports = [
+        "${toString jellyfin_port}:8096/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--device=/dev/dri:/dev/dri:rwm"
+        "--network-alias=jellyfin"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-jellyfin" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
