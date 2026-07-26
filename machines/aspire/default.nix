@@ -62,7 +62,6 @@ in
     media-server = {
       enable = true;
       volumeDir = "${baseServicesDir}/media-server";
-      torrentingPort = 47563;
     };
     msmtp.enable = true;
     opencloud = {

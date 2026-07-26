@@ -24,6 +24,7 @@ let
   filebrowser_volume_dir = "${cfg.volumeDir}/filebrowser";
   filebrowser_config_dir = "${filebrowser_volume_dir}/config";
   filebrowser_database_dir = "${filebrowser_volume_dir}/database";
+  gluetun_vpn_open_port = 47563;
   gluetun_volume_dir = "${cfg.volumeDir}/gluetun";
   gluetun_gluetun_dir = "${gluetun_volume_dir}/gluetun";
   jellyfin_port = 8096;
@@ -61,10 +62,6 @@ in
 
     volumeDir = lib.mkOption {
       type = lib.types.path;
-    };
-
-    torrentingPort = lib.mkOption {
-      type = lib.types.int;
     };
   };
 
@@ -250,7 +247,7 @@ in
     virtualisation.oci-containers.containers."media-server-gluetun" = {
       image = "docker.io/qmcgaw/gluetun:v3";
       environment = {
-        "FIREWALL_VPN_INPUT_PORTS" = toString cfg.torrentingPort;
+        "FIREWALL_VPN_INPUT_PORTS" = toString gluetun_vpn_open_port;
         "PGID" = toString gid;
         "PUID" = toString uid;
         "SERVER_COUNTRIES" = "Netherlands";
@@ -385,7 +382,7 @@ in
         "DOCKER_MODS" = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
         "PGID" = toString gid;
         "PUID" = toString uid;
-        "TORRENTING_PORT" = toString cfg.torrentingPort;
+        "TORRENTING_PORT" = toString gluetun_vpn_open_port;
         "TZ" = timezone;
         "WEBUI_PORT" = toString qbittorrent_port;
       };
