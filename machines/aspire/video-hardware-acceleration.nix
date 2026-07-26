@@ -14,4 +14,8 @@
       intel-ocl # OpenCL support
     ];
   };
+
+  environment.systemPackages = with pkgs; [
+    intel-gpu-tools # Monnitoring and debugging tools for Intel GPUs
+  ];
 }
