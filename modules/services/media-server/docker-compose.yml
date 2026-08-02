@@ -123,6 +123,26 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
+  qbit-manage:
+    container_name: media-server-qbit-manage
+    image: ghcr.io/stuffanthings/qbit_manage:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 8181:8181
+    environment:
+      - *puid
+      - *pgid
+      - *tz
+      - QBT_WEB_SERVER=true
+      - QBT_PORT=8181
+    volumes:
+      - *torrents
+      - /media/external/data-vault/services/media-server/qbit-manage/config:/config
+      - /media/external/data-vault/services/media-server/qbittorrent:/qbittorrent:ro
+    labels:
+      - io.containers.autoupdate=registry
+
   qbittorrent:
     container_name: media-server-qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest

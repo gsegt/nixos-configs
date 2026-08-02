@@ -35,6 +35,9 @@ let
   prowlarr_port = 9696;
   prowlarr_volume_dir = "${cfg.volumeDir}/prowlarr";
   prowlarr_config_dir = "${prowlarr_volume_dir}/config";
+  qbit_manage_port = 8181;
+  qbit_manage_volume_dir = "${cfg.volumeDir}/qbit-manage";
+  qbit_manage_config_dir = "${qbit_manage_volume_dir}/config";
   qbittorrent_port = 8080;
   qbittorrent_volume_dir = "${cfg.volumeDir}/qbittorrent";
   qbittorrent_config_dir = "${qbittorrent_volume_dir}/config";
@@ -85,6 +88,8 @@ in
       "d ${jellyfin_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${qbit_manage_volume_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${qbit_manage_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${qbittorrent_volume_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${qbittorrent_config_dir} 0755 ${toString uid} ${toString gid} - -"
       "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
@@ -99,6 +104,7 @@ in
       bazarr_port
       clonarr_port
       prowlarr_port
+      qbit_manage_port
       qbittorrent_port
       radarr_port
       sonarr_port
@@ -360,6 +366,49 @@ in
       ];
     };
     systemd.services."podman-media-server-prowlarr" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      after = [
+        "podman-network-media-server.service"
+      ];
+      requires = [
+        "podman-network-media-server.service"
+      ];
+      partOf = [
+        "podman-compose-media-server-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-media-server-root.target"
+      ];
+    };
+    virtualisation.oci-containers.containers."media-server-qbit-manage" = {
+      image = "ghcr.io/stuffanthings/qbit_manage:latest";
+      environment = {
+        "PGID" = toString gid;
+        "PUID" = toString uid;
+        "QBT_PORT" = "${toString qbit_manage_port}";
+        "QBT_WEB_SERVER" = "true";
+        "TZ" = timezone;
+      };
+      volumes = [
+        "${torrents_dir}:/data/torrents:rw"
+        "${qbit_manage_config_dir}:/config:rw"
+        "${qbittorrent_volume_dir}:/qbittorrent:ro"
+      ];
+      ports = [
+        "${toString qbit_manage_port}:${toString qbit_manage_port}/tcp"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=qbit-manage"
+        "--network=media-server"
+      ];
+    };
+    systemd.services."podman-media-server-qbit-manage" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
