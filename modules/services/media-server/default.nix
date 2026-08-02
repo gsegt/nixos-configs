@@ -436,8 +436,8 @@ in
         "WEBUI_PORT" = toString qbittorrent_port;
       };
       volumes = [
-        "${qbittorrent_config_dir}:/config:rw"
         "${torrents_dir}:/data/torrents:rw"
+        "${qbittorrent_config_dir}:/config:rw"
       ];
       labels = {
         "io.containers.autoupdate" = "registry";
