@@ -162,6 +162,7 @@ in
       volumes = [
         "${opencloud_ref_dir}/config/euro-office/app-registry.yaml:/etc/opencloud/app-registry.yaml:rw"
         "${opencloud_ref_dir}/config/opencloud/apps:/var/lib/opencloud/web/assets/apps:rw"
+        "${opencloud_ref_dir}/config/opencloud/apps.yaml:/etc/opencloud/apps.yaml:rw"
         "${opencloud_ref_dir}/config/opencloud/banned-password-list.txt:/etc/opencloud/banned-password-list.txt:rw"
         "${opencloud_ref_dir}/config/opencloud/csp.yaml:/etc/opencloud/csp.yaml:rw"
         "${opencloud_config_dir}:/etc/opencloud:rw"
