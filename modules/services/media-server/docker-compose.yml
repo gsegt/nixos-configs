@@ -49,7 +49,7 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     ports:
-      - 8082:80
+      - 8282:80
     environment:
       - *puid
       - *pgid

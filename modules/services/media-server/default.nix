@@ -18,7 +18,7 @@ let
   clonarr_port = 6060;
   clonarr_volume_dir = "${cfg.volumeDir}/clonarr";
   clonarr_config_dir = "${clonarr_volume_dir}/config";
-  filebrowser_port = 8082;
+  filebrowser_port = 8282;
   filebrowser_subdomain = "filebrowser";
   filebrowser_uri = "${filebrowser_subdomain}.${config.modules.services.reverse-proxy.domain}";
   filebrowser_volume_dir = "${cfg.volumeDir}/filebrowser";
