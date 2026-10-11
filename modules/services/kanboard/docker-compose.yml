@@ -1,0 +1,47 @@
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+
+name: &name kanboard
+
+services:
+  app:
+    container_name: kanboard-kanboard
+    image: docker.io/kanboard/kanboard:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+     - 8383:80
+    volumes:
+     - /media/external/data-vault/services/kanboard/kanboard/data:/var/www/app/data
+     - /media/external/data-vault/services/kanboard/kanboard/plugins:/var/www/app/plugins
+     - /media/external/data-vault/services/kanboard/kanboard/certs:/etc/nginx/ssl
+    environment:
+     - PLUGIN_INSTALLER=true
+     - DB_DRIVER=postgres
+     - DB_HOSTNAME=postgres
+     - MAIL_SMTP_FROM=kanboard@gsegt.eu
+     - MAIL_SMTP_HOST=smtp.mail.ovh.net
+     - MAIL_SMTP_PORT=587
+     - MAIL_SMTP_ENCRYPTION=tls
+     - MAIL_SMTP_USERNAME=mail@gsegt.eu
+    depends_on:
+      - postgres
+    labels:
+      - compose2nix.settings.sops.secrets=kanboard/kanboard/env
+      - io.containers.autoupdate=registry
+  postgres:
+    image: docker.io/library/postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: kanboard
+    volumes:
+      - /media/external/data-vault/services/kanboard/postgres/postgresql:/var/lib/postgresql
+    labels:
+      - compose2nix.settings.sops.secrets=kanboard/postgres/env
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/kanboard/docker-compose.yml -output modules/services/kanboard/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/kanboard/default-debug.nix
