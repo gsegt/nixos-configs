@@ -1,0 +1,62 @@
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+x-environment: &environment
+  PUID: 1000
+  PGID: 1000
+  CROSSPLAY_ENABLED: false
+  MODIFIER_RESOURCES: muchmore
+  BEPINEX_ENABLED: true
+  BEPINEXPACK_VERSION: 5.4.2351
+  UPDATE_ON_START: false
+  MODS: MidnightMods-AchievementEnabler-0.5.1,Grantapher-ValheimPlus_Grantapher_Temporary-10.4.0,ValheimModding-Jotunn-2.30.2,ViperAlpha-EquipmentAndQuickSlotsByViper-3.1.5
+
+name: &name valheim
+
+services:
+  harmless-midock:
+    container_name: valheim-harmless-midock
+    image: docker.io/indifferentbroccoli/valheim-server-docker:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      <<: *environment
+      PORT: 2456
+      SERVER_NAME: harmless-midock
+      WORLD_NAME: harmless-midock
+    volumes:
+      - /media/external/data-vault/services/valheim/harmless-midock/valheim:/valheim
+      - /media/external/data-vault/services/valheim/harmless-midock/valheim-saves:/valheim-saves
+    ports:
+      - 2456:2456/udp
+      - 2457:2457/udp
+    stop_grace_period: 30s
+    labels:
+      - compose2nix.settings.sops.secrets=valheim/harmless-midock/env
+      - io.containers.autoupdate=registry
+
+  overc-loc:
+    container_name: valheim-overc-loc
+    image: docker.io/indifferentbroccoli/valheim-server-docker:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      <<: *environment
+      PORT: 2458
+      SERVER_NAME: overc-loc
+      WORLD_NAME: overc-loc
+    volumes:
+      - /media/external/data-vault/services/valheim/overc-loc/valheim:/valheim
+      - /media/external/data-vault/services/valheim/overc-loc/valheim-saves:/valheim-saves
+    ports:
+      - 2458:2458/udp
+      - 2459:2459/udp
+    stop_grace_period: 30s
+    labels:
+      - compose2nix.settings.sops.secrets=valheim/overc-loc/env
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/valheim/docker-compose.yml -output modules/services/valheim/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/valheim/default-debug.nix

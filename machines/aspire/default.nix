@@ -77,6 +77,10 @@ in
       volumeDir = "${baseServicesDir}/radicale";
     };
     reverse-proxy.enable = true;
+    valheim = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/valheim";
+    };
     vaultwarden = {
       enable = true;
       volumeDir = "${baseServicesDir}/vaultwarden";
