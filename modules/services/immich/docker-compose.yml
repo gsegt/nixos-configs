@@ -16,9 +16,9 @@ services:
       - /media/external/data-vault/services/immich/server/data:/data
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=Europe/Paris
-      - DB_USERNAME=postgres
-      - DB_DATABASE_NAME=immich
+      TZ: Europe/Paris
+      DB_USERNAME: postgres
+      DB_DATABASE_NAME: immich
     ports:
       - 2283:2283
     depends_on:
@@ -59,9 +59,9 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=immich
-      - POSTGRES_INITDB_ARGS=--data-checksums
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
       - /media/external/data-vault/services/immich/postgres/data:/var/lib/postgresql/data
     shm_size: 128mb

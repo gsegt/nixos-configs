@@ -7,13 +7,13 @@ services:
     pull_policy: always
     restart: unless-stopped
     environment:
-     - DOMAIN=https://vaultwarden.gsegt.eu
-     - SIGNUPS_ALLOWED=false
-     - SMTP_FROM=vaultwarden@gsegt.eu
-     - SMTP_HOST=smtp.mail.ovh.net
-     - SMTP_PORT=587
-     - SMTP_SECURITY=starttls
-     - SMTP_USERNAME=mail@gsegt.eu
+      DOMAIN: https://vaultwarden.gsegt.eu
+      SIGNUPS_ALLOWED: false
+      SMTP_FROM: vaultwarden@gsegt.eu
+      SMTP_HOST: smtp.mail.ovh.net
+      SMTP_PORT: 587
+      SMTP_SECURITY: starttls
+      SMTP_USERNAME: mail@gsegt.eu
     volumes:
      - /media/external/data-vault/services/vaultwarden/data:/data
     ports:

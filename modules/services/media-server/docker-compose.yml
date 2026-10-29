@@ -1,8 +1,12 @@
 x-restart: &restart unless-stopped
 x-pull_policy: &pull_policy always
-x-puid: &puid PUID=1000
-x-pgid: &pgid PGID=1000
-x-tz: &tz TZ=Europe/Paris
+x-puid: &puid 1000
+x-pgid: &pgid 1000
+x-tz: &tz Europe/Paris
+x-environment: &environment
+  PUID: *puid
+  PGID: *pgid
+  TZ: *tz
 x-data: &data "/media/external/data-vault/services/media-server:/data"
 x-media: &media "/media/external/data-vault/services/media-server/data/media:/data/media"
 x-torrents: &torrents "/media/external/data-vault/services/media-server/data/torrents:/data/torrents"
@@ -18,9 +22,7 @@ services:
     ports:
       - 6767:6767
     environment:
-      - *puid
-      - *pgid
-      - *tz
+      <<: *environment
     volumes:
       - *media
       - /media/external/data-vault/services/media-server/bazarr/config:/config
@@ -35,9 +37,7 @@ services:
     ports:
       - 6060:6060
     environment:
-      - *puid
-      - *pgid
-      - *tz
+      <<: *environment
     volumes:
       - /media/external/data-vault/services/media-server/clonarr/config:/config
     labels:
@@ -51,8 +51,8 @@ services:
     ports:
       - 8282:80
     environment:
-      - *puid
-      - *pgid
+      PUID: *puid
+      PGID: *pgid
     volumes:
       - /media/external/data-vault/services/media-server/data/media:/srv
       - /media/external/data-vault/services/media-server/filebrowser/database:/database
@@ -66,14 +66,12 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     environment:
-      - *puid
-      - *pgid
-      - *tz
-      - VPN_SERVICE_PROVIDER=airvpn
-      - VPN_TYPE=wireguard
-      - SERVER_COUNTRIES=Netherlands
-      - FIREWALL_VPN_INPUT_PORTS=47563
-      - UPDATER_PERIOD=480h
+      <<: *environment
+      VPN_SERVICE_PROVIDER: airvpn
+      VPN_TYPE: wireguard
+      SERVER_COUNTRIES: Netherlands
+      FIREWALL_VPN_INPUT_PORTS: 47563
+      UPDATER_PERIOD: 480h
     ports:
       - 8080:8080 # qBittorrent webui
     volumes:
@@ -95,10 +93,8 @@ services:
     ports:
       - 8096:8096
     environment:
-      - *puid
-      - *pgid
-      - *tz
-      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+      <<: *environment
+      DOCKER_MODS: linuxserver/mods:jellyfin-opencl-intel
     volumes:
       - *media
       - /media/external/data-vault/services/media-server/jellyfin/config:/config
@@ -115,9 +111,7 @@ services:
     ports:
       - 9696:9696
     environment:
-      - *puid
-      - *pgid
-      - *tz
+      <<: *environment
     volumes:
       - /media/external/data-vault/services/media-server/prowlarr/config:/config
     labels:
@@ -131,11 +125,9 @@ services:
     ports:
       - 8181:8181
     environment:
-      - *puid
-      - *pgid
-      - *tz
-      - QBT_WEB_SERVER=true
-      - QBT_PORT=8181
+      <<: *environment
+      QBT_WEB_SERVER: true
+      QBT_PORT: 8181
     volumes:
       - *torrents
       - /media/external/data-vault/services/media-server/qbit-manage/config:/config
@@ -149,12 +141,10 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     environment:
-      - *puid
-      - *pgid
-      - *tz
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=47563
-      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+      <<: *environment
+      WEBUI_PORT: 8080
+      TORRENTING_PORT: 47563
+      DOCKER_MODS: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     volumes:
       - *torrents
       - /media/external/data-vault/services/media-server/qbittorrent/config:/config
@@ -170,9 +160,7 @@ services:
     ports:
       - 7878:7878
     environment:
-      - *puid
-      - *pgid
-      - *tz
+      <<: *environment
     volumes:
       - *data
       - /media/external/data-vault/services/media-server/radarr/config:/config
@@ -187,7 +175,7 @@ services:
     ports:
       - 5055:5055
     environment:
-      - *tz
+      TZ: *tz
     volumes:
       - /media/external/data-vault/services/media-server/seerr/config:/app/config
     labels:
@@ -202,9 +190,7 @@ services:
     ports:
       - 8989:8989
     environment:
-      - *puid
-      - *pgid
-      - *tz
+      <<: *environment
     volumes:
       - *data
       - /media/external/data-vault/services/media-server/sonarr/config:/config

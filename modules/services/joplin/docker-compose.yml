@@ -10,13 +10,13 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     environment:
-      - APP_PORT=22300
-      - APP_BASE_URL=https://joplin.gsegt.eu
-      - DB_CLIENT=pg
-      - POSTGRES_DATABASE=joplin
-      - POSTGRES_PORT=5432
-      - POSTGRES_HOST=joplin-postgres
-      - STORAGE_DRIVER=Type=Filesystem; Path=/data
+      APP_PORT: 22300
+      APP_BASE_URL: https://joplin.gsegt.eu
+      DB_CLIENT: pg
+      POSTGRES_DATABASE: joplin
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: joplin-postgres
+      STORAGE_DRIVER: Type=Filesystem; Path=/data
     volumes:
       - /media/external/data-vault/services/joplin/joplin/data:/data
     ports:
@@ -33,7 +33,7 @@ services:
     pull_policy: *pull_policy
     restart: *restart
     environment:
-      - POSTGRES_DB=joplin
+       POSTGRES_DB: joplin
     volumes:
       - /media/external/data-vault/services/joplin/postgres/data:/var/lib/postgresql/data
     labels:
