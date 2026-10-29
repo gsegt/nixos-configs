@@ -55,10 +55,6 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/joplin";
     };
-    mealie = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/mealie";
-    };
     media-server = {
       enable = true;
       volumeDir = "${baseServicesDir}/media-server";
@@ -71,6 +67,10 @@ in
     radicale = {
       enable = true;
       volumeDir = "${baseServicesDir}/radicale";
+    };
+    recipes = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/recipes";
     };
     reverse-proxy.enable = true;
     valheim = {
