@@ -55,10 +55,6 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/joplin";
     };
-    kanboard = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/kanboard";
-    };
     mealie = {
       enable = true;
       volumeDir = "${baseServicesDir}/mealie";
