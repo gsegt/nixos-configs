@@ -1,19 +1,19 @@
 x-restart: &restart unless-stopped
 x-pull_policy: &pull_policy always
 
-name: &name immich
+name: &name photos
 
 services:
   immich-server:
-    container_name: immich-server
+    container_name: photos-immich-server
     image: ghcr.io/immich-app/immich-server:release
     extends:
-      file: /etc/nixos/modules/services/immich/hwaccel.transcoding.yml
+      file: /etc/nixos/modules/services/photos/hwaccel.transcoding.yml
       service: vaapi
     pull_policy: *pull_policy
     restart: *restart
     volumes:
-      - /media/external/data-vault/services/immich/server/data:/data
+      - /media/external/data-vault/services/photos/immich-server/data:/data
       - /etc/localtime:/etc/localtime:ro
     environment:
       TZ: Europe/Paris
@@ -27,14 +27,14 @@ services:
     healthcheck:
       disable: false
     labels:
-      - compose2nix.settings.sops.secrets=immich/server/env
+      - compose2nix.settings.sops.secrets=photos/immich-server/env
       - io.containers.autoupdate=registry
 
   immich-machine-learning:
-    container_name: immich-machine-learning
+    container_name: photos-immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-openvino
     extends:
-      file: /etc/nixos/modules/services/immich/hwaccel.ml.yml
+      file: /etc/nixos/modules/services/photos/hwaccel.ml.yml
       service: openvino
     pull_policy: *pull_policy
     restart: *restart
@@ -46,15 +46,15 @@ services:
       - io.containers.autoupdate=registry
 
   redis:
-    container_name: immich-redis
-    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
+    container_name: photos-redis
+    image: docker.io/valkey/valkey:9@sha256:c123e3715db63d06d4ad6964884037aa0d5d4d703939b9929954112889708e1d
     pull_policy: *pull_policy
     restart: *restart
     healthcheck:
       test: redis-cli ping || exit 1
 
   database:
-    container_name: immich-postgres
+    container_name: photos-postgres
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
     pull_policy: *pull_policy
     restart: *restart
@@ -63,19 +63,19 @@ services:
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
-      - /media/external/data-vault/services/immich/postgres/data:/var/lib/postgresql/data
+      - /media/external/data-vault/services/photos/postgres/data:/var/lib/postgresql/data
     shm_size: 128mb
     healthcheck:
       disable: false
     labels:
-      - compose2nix.settings.sops.secrets=immich/postgres/env
+      - compose2nix.settings.sops.secrets=photos/postgres/env
 
 volumes:
   model-cache:
-    name: model-cache
+    name: photos-immich-machine-learning-model-cache
 
 networks:
   default:
     name: *name
 
-# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/immich/docker-compose.yml -output modules/services/immich/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/immich/default-debug.nix
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/photos/docker-compose.yml -output modules/services/photos/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/photos/default-debug.nix

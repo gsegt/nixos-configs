@@ -51,10 +51,6 @@ in
       volumeDir = "${baseServicesDir}/dav";
     };
     dyndns-ovh.enable = true;
-    immich = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/immich";
-    };
     media-server = {
       enable = true;
       volumeDir = "${baseServicesDir}/media-server";
@@ -71,6 +67,10 @@ in
     password-manager = {
       enable = true;
       volumeDir = "${baseServicesDir}/password-manager";
+    };
+    photos = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/photos";
     };
     recipes = {
       enable = true;
