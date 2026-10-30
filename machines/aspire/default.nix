@@ -51,15 +51,15 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/immich";
     };
-    joplin = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/joplin";
-    };
     media-server = {
       enable = true;
       volumeDir = "${baseServicesDir}/media-server";
     };
     msmtp.enable = true;
+    notes = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/notes";
+    };
     opencloud = {
       enable = true;
       volumeDir = "${baseServicesDir}/opencloud";

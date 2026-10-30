@@ -6,18 +6,18 @@
 }:
 
 let
-  service = "joplin";
-  joplin_port = 22300;
-  joplin_subdomain = service;
-  joplin_uri = "${joplin_subdomain}.${config.modules.services.reverse-proxy.domain}";
-  joplin_uid = 1001;
-  joplin_gid = 1001;
+  service = "notes";
+  subdomain = service;
+  uri = "${subdomain}.${config.modules.services.reverse-proxy.domain}";
   joplin_volume_dir = "${cfg.volumeDir}/joplin";
   joplin_data_dir = "${joplin_volume_dir}/data";
-  postgres_uid = 70;
-  postgres_gid = 70;
+  joplin_uid = 1001;
+  joplin_gid = 1001;
+  joplin_port = 22300;
   postgres_volume_dir = "${cfg.volumeDir}/postgres";
   postgres_data_dir = "${postgres_volume_dir}/data";
+  postgres_uid = 70;
+  postgres_gid = 70;
   cfg = config.modules.services.${service};
 in
 {
@@ -30,7 +30,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."joplin/env" = { };
+    sops.secrets = {
+      "notes/joplin/env" = { };
+      "notes/postgres/env" = { };
+    };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
@@ -41,27 +44,27 @@ in
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
-      virtualHosts."${joplin_uri}".extraConfig = ''
+      virtualHosts."${uri}".extraConfig = ''
         reverse_proxy localhost:${toString joplin_port}
       '';
     };
 
-    modules.services.dyndns-ovh.subdomains = [ joplin_subdomain ];
+    modules.services.dyndns-ovh.subdomains = [ subdomain ];
 
     # Containers
-    virtualisation.oci-containers.containers."joplin-joplin" = {
+    virtualisation.oci-containers.containers."notes-joplin" = {
       image = "docker.io/joplin/server:latest";
       environment = {
-        "APP_BASE_URL" = "https://${joplin_uri}";
+        "APP_BASE_URL" = "https://${uri}";
         "APP_PORT" = "22300";
         "DB_CLIENT" = "pg";
         "POSTGRES_DATABASE" = "joplin";
-        "POSTGRES_HOST" = "joplin-postgres";
+        "POSTGRES_HOST" = "notes-postgres";
         "POSTGRES_PORT" = "5432";
         "STORAGE_DRIVER" = "Type=Filesystem; Path=/data";
       };
       environmentFiles = [
-        config.sops.secrets."joplin/env".path
+        config.sops.secrets."notes/joplin/env".path
       ];
       volumes = [
         "${joplin_data_dir}:/data:rw"
@@ -70,93 +73,93 @@ in
         "${toString joplin_port}:22300/tcp"
       ];
       labels = {
-        "compose2nix.settings.sops.secrets" = "joplin/env";
+        "compose2nix.settings.sops.secrets" = "notes/joplin/env";
         "io.containers.autoupdate" = "registry";
       };
       dependsOn = [
-        "joplin-postgres"
+        "notes-postgres"
       ];
       log-driver = "journald";
       extraOptions = [
         "--network-alias=joplin"
-        "--network=joplin"
+        "--network=notes"
       ];
     };
-    systemd.services."podman-joplin-joplin" = {
+    systemd.services."podman-notes-joplin" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
       after = [
-        "podman-network-joplin.service"
+        "podman-network-notes.service"
       ];
       requires = [
-        "podman-network-joplin.service"
+        "podman-network-notes.service"
       ];
       partOf = [
-        "podman-compose-joplin-root.target"
+        "podman-compose-notes-root.target"
       ];
       wantedBy = [
-        "podman-compose-joplin-root.target"
+        "podman-compose-notes-root.target"
       ];
     };
-    virtualisation.oci-containers.containers."joplin-postgres" = {
+    virtualisation.oci-containers.containers."notes-postgres" = {
       image = "docker.io/library/postgres:16-alpine";
       environment = {
         "POSTGRES_DB" = "joplin";
       };
       environmentFiles = [
-        config.sops.secrets."joplin/env".path
+        config.sops.secrets."notes/postgres/env".path
       ];
       volumes = [
         "${postgres_data_dir}:/var/lib/postgresql/data:rw"
       ];
       labels = {
-        "compose2nix.settings.sops.secrets" = "joplin/env";
+        "compose2nix.settings.sops.secrets" = "notes/postgres/env";
         "io.containers.autoupdate" = "registry";
       };
       log-driver = "journald";
       extraOptions = [
         "--network-alias=postgres"
-        "--network=joplin"
+        "--network=notes"
       ];
     };
-    systemd.services."podman-joplin-postgres" = {
+    systemd.services."podman-notes-postgres" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
       after = [
-        "podman-network-joplin.service"
+        "podman-network-notes.service"
       ];
       requires = [
-        "podman-network-joplin.service"
+        "podman-network-notes.service"
       ];
       partOf = [
-        "podman-compose-joplin-root.target"
+        "podman-compose-notes-root.target"
       ];
       wantedBy = [
-        "podman-compose-joplin-root.target"
+        "podman-compose-notes-root.target"
       ];
     };
 
     # Networks
-    systemd.services."podman-network-joplin" = {
+    systemd.services."podman-network-notes" = {
       path = [ pkgs.podman ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStop = "podman network rm -f joplin";
+        ExecStop = "podman network rm -f notes";
       };
       script = ''
-        podman network inspect joplin || podman network create joplin
+        podman network inspect notes || podman network create notes
       '';
-      partOf = [ "podman-compose-joplin-root.target" ];
-      wantedBy = [ "podman-compose-joplin-root.target" ];
+      partOf = [ "podman-compose-notes-root.target" ];
+      wantedBy = [ "podman-compose-notes-root.target" ];
     };
 
     # Root service
     # When started, this will automatically create all resources and start
     # the containers. When stopped, this will teardown all resources.
-    systemd.targets."podman-compose-joplin-root" = {
+    systemd.targets."podman-compose-notes-root" = {
       unitConfig = {
         Description = "Root target generated by compose2nix.";
       };
