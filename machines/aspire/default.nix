@@ -46,6 +46,10 @@ in
   };
 
   modules.services = {
+    dav = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/dav";
+    };
     dyndns-ovh.enable = true;
     immich = {
       enable = true;
@@ -67,10 +71,6 @@ in
     password-manager = {
       enable = true;
       volumeDir = "${baseServicesDir}/password-manager";
-    };
-    radicale = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/radicale";
     };
     recipes = {
       enable = true;

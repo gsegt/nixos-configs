@@ -1,0 +1,23 @@
+name: &name dav
+
+services:
+  radicale:
+    container_name: dav-radicale
+    image: docker.io/kozea/radicale:stable
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - /media/external/data-vault/services/dav/radicale/data:/var/lib/radicale
+      - /run/secrets/dav/radicale/htpasswd:/run/secrets/htpasswd:ro
+      - /etc/nixos/modules/services/dav/config:/etc/radicale/config:ro
+      - /etc/nixos/modules/services/dav/create_birthday_calendar.py:/usr/local/bin/create_birthday_calendar.py:ro # Script adapted from https://github.com/iBigQ/radicale-birthday-calendar
+    ports:
+      - 5232:5232
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/dav/docker-compose.yml -output modules/services/dav/default-debug.nix
