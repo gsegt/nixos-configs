@@ -383,7 +383,7 @@ in
       ];
     };
     virtualisation.oci-containers.containers."media-server-qbit-manage" = {
-      image = "ghcr.io/stuffanthings/qbit_manage:latest";
+      image = "ghcr.io/stuffanthings/qbit_manage:develop";
       environment = {
         "PGID" = toString gid;
         "PUID" = toString uid;

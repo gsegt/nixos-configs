@@ -119,7 +119,7 @@ services:
 
   qbit-manage:
     container_name: media-server-qbit-manage
-    image: ghcr.io/stuffanthings/qbit_manage:latest
+    image: ghcr.io/stuffanthings/qbit_manage:develop
     pull_policy: *pull_policy
     restart: *restart
     ports:
