@@ -64,6 +64,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/opencloud";
     };
+    password-manager = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/password-manager";
+    };
     radicale = {
       enable = true;
       volumeDir = "${baseServicesDir}/radicale";
@@ -76,10 +80,6 @@ in
     valheim = {
       enable = true;
       volumeDir = "${baseServicesDir}/valheim";
-    };
-    vaultwarden = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/vaultwarden";
     };
   };
 
