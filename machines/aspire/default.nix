@@ -50,6 +50,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/dav";
     };
+    drive = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/drive";
+    };
     dyndns-ovh.enable = true;
     media-server = {
       enable = true;
@@ -59,10 +63,6 @@ in
     notes = {
       enable = true;
       volumeDir = "${baseServicesDir}/notes";
-    };
-    opencloud = {
-      enable = true;
-      volumeDir = "${baseServicesDir}/opencloud";
     };
     password-manager = {
       enable = true;

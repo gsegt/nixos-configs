@@ -6,18 +6,19 @@
 }:
 
 let
-  service = "opencloud";
-  opencloud_port = 9200;
-  opencloud_subdomain = service;
-  opencloud_uri = "${opencloud_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  service = "drive";
+  subdomain = service;
+  uri = "${subdomain}.${config.modules.services.reverse-proxy.domain}";
+  office_subdomain = "office";
+  office_uri = "${office_subdomain}.${config.modules.services.reverse-proxy.domain}";
+  opencloud_volume_dir = "${cfg.volumeDir}/opencloud";
+  opencloud_data_dir = "${opencloud_volume_dir}/data";
+  opencloud_config_dir = "${opencloud_volume_dir}/config";
   opencloud_uid = 1000;
   opencloud_gid = 1000;
-  opencloud_data_dir = "${cfg.volumeDir}/data";
-  opencloud_config_dir = "${cfg.volumeDir}/config";
-  opencloud_ref_dir = "/etc/nixos/modules/services/opencloud/compose";
+  opencloud_port = 9200;
+  opencloud_ref_dir = "/etc/nixos/modules/services/drive/compose";
   euro_office_port = 9900;
-  euro_office_subdomain = "euro-office";
-  euro_office_uri = "${euro_office_subdomain}.${config.modules.services.reverse-proxy.domain}";
   cfg = config.modules.services.${service};
 in
 {
@@ -31,28 +32,29 @@ in
 
   config = lib.mkIf cfg.enable {
     sops.secrets = {
-      "opencloud/opencloud/env" = { };
-      "opencloud/euro-office/env" = { };
+      "drive/opencloud/env" = { };
+      "drive/euro-office/env" = { };
     };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
+      "d ${opencloud_volume_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
       "d ${opencloud_data_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
       "d ${opencloud_config_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
-      virtualHosts."${opencloud_uri}".extraConfig = ''
+      virtualHosts."${uri}".extraConfig = ''
         reverse_proxy localhost:${toString opencloud_port}
       '';
-      virtualHosts."${euro_office_uri}".extraConfig = ''
+      virtualHosts."${office_uri}".extraConfig = ''
         reverse_proxy localhost:${toString euro_office_port}
       '';
     };
 
     modules.services.dyndns-ovh.subdomains = [
-      opencloud_subdomain
-      euro_office_subdomain
+      subdomain
+      office_subdomain
     ];
 
     fileSystems."/usr/share/fonts/truetype" =
@@ -71,7 +73,7 @@ in
       };
 
     # Containers
-    virtualisation.oci-containers.containers."opencloud-euro-office" = {
+    virtualisation.oci-containers.containers."drive-euro-office" = {
       image = "ghcr.io/euro-office/documentserver:latest";
       environment = {
         "USE_UNAUTHORIZED_STORAGE" = "false";
@@ -90,52 +92,52 @@ in
       log-driver = "journald";
       extraOptions = [
         "--network-alias=euro-office"
-        "--network=opencloud_opencloud-net"
+        "--network=drive_opencloud-net"
       ];
     };
-    systemd.services."podman-opencloud-euro-office" = {
+    systemd.services."podman-drive-euro-office" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
       after = [
-        "podman-network-opencloud_opencloud-net.service"
+        "podman-network-drive_opencloud-net.service"
       ];
       requires = [
-        "podman-network-opencloud_opencloud-net.service"
+        "podman-network-drive_opencloud-net.service"
       ];
       partOf = [
-        "podman-compose-opencloud-root.target"
+        "podman-compose-drive-root.target"
       ];
       wantedBy = [
-        "podman-compose-opencloud-root.target"
+        "podman-compose-drive-root.target"
       ];
     };
-    virtualisation.oci-containers.containers."opencloud-opencloud" = {
+    virtualisation.oci-containers.containers."drive-opencloud" = {
       image = "docker.io/opencloudeu/opencloud-rolling:latest";
       environment = {
-        "COLLABORATION_APP_ADDR" = "https://${euro_office_uri}";
+        "COLLABORATION_APP_ADDR" = "https://${office_uri}";
         "COLLABORATION_APP_ICON" =
-          "https://${euro_office_uri}/web-apps/apps/documenteditor/main/resources/img/favicon.ico";
+          "https://${office_uri}/web-apps/apps/documenteditor/main/resources/img/favicon.ico";
         "COLLABORATION_APP_INSECURE" = "true";
         "COLLABORATION_APP_NAME" = "Euro-Office";
         "COLLABORATION_APP_PRODUCT" = "OnlyOffice";
         "COLLABORATION_APP_PROOF_DISABLE" = "true";
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE" = "true";
-        "COLLABORATION_WOPI_SRC" = "https://${opencloud_uri}";
-        "EURO_OFFICE_DOMAIN" = euro_office_uri;
+        "COLLABORATION_WOPI_SRC" = "https://${uri}";
+        "EURO_OFFICE_DOMAIN" = office_uri;
         "FRONTEND_ARCHIVER_MAX_SIZE" = "10000000000";
         "FRONTEND_CHECK_FOR_UPDATES" = "true";
         "IDM_CREATE_DEMO_USERS" = "false";
         "NOTIFICATIONS_SMTP_AUTHENTICATION" = "";
-        "NOTIFICATIONS_SMTP_ENCRYPTION" = "none";
-        "NOTIFICATIONS_SMTP_HOST" = "";
+        "NOTIFICATIONS_SMTP_ENCRYPTION" = "starttls";
+        "NOTIFICATIONS_SMTP_HOST" = "smtp.mail.ovh.net";
         "NOTIFICATIONS_SMTP_INSECURE" = "false";
-        "NOTIFICATIONS_SMTP_PASSWORD" = "";
-        "NOTIFICATIONS_SMTP_PORT" = "";
-        "NOTIFICATIONS_SMTP_SENDER" = "OpenCloud Notifications <notifications@cloud.opencloud.test>";
-        "NOTIFICATIONS_SMTP_USERNAME" = "";
-        "OC_ADD_RUN_SERVICES" = "collaboration";
-        "OC_DEFAULT_LANGUAGE" = "";
+        "NOTIFICATIONS_SMTP_PORT" = "587";
+        "NOTIFICATIONS_SMTP_SENDER" = "OpenCloud Notifications <drive@gsegt.eu>";
+        "NOTIFICATIONS_SMTP_USERNAME" = "mail@gsegt.eu";
+        "OC_ADD_RUN_SERVICES" = "notifications,collaboration";
+        "OC_DEFAULT_LANGUAGE" = "en";
+        "OC_ENABLE_GUEST_LINKS" = "false";
         "OC_INSECURE" = "false";
         "OC_LOG_COLOR" = "false";
         "OC_LOG_LEVEL" = "info";
@@ -149,7 +151,7 @@ in
         "OC_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS" = "1";
         "OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" = "true";
         "OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" = "false";
-        "OC_URL" = "https://${opencloud_uri}";
+        "OC_URL" = "https://${uri}";
         "PROXY_CSP_CONFIG_FILE_LOCATION" = "/etc/opencloud/csp.yaml";
         "PROXY_ENABLE_BASIC_AUTH" = "false";
         "PROXY_HTTP_ADDR" = "0.0.0.0:9200";
@@ -157,7 +159,7 @@ in
         "TRAEFIK_PORT_HTTPS" = "";
       };
       environmentFiles = [
-        config.sops.secrets."opencloud/opencloud/env".path
+        config.sops.secrets."drive/opencloud/env".path
       ];
       volumes = [
         "${opencloud_ref_dir}/config/euro-office/app-registry.yaml:/etc/opencloud/app-registry.yaml:rw"
@@ -172,7 +174,7 @@ in
         "127.0.0.1:${toString opencloud_port}:9200/tcp"
       ];
       labels = {
-        "compose2nix.settings.sops.secrets" = "opencloud/opencloud/env";
+        "compose2nix.settings.sops.secrets" = "drive/opencloud/env";
         "io.containers.autoupdate" = "registry";
       };
       cmd = [
@@ -184,46 +186,46 @@ in
       extraOptions = [
         "--entrypoint=[\"/bin/sh\"]"
         "--network-alias=opencloud"
-        "--network=opencloud_opencloud-net"
+        "--network=drive_opencloud-net"
       ];
     };
-    systemd.services."podman-opencloud-opencloud" = {
+    systemd.services."podman-drive-opencloud" = {
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
       after = [
-        "podman-network-opencloud_opencloud-net.service"
+        "podman-network-drive_opencloud-net.service"
       ];
       requires = [
-        "podman-network-opencloud_opencloud-net.service"
+        "podman-network-drive_opencloud-net.service"
       ];
       partOf = [
-        "podman-compose-opencloud-root.target"
+        "podman-compose-drive-root.target"
       ];
       wantedBy = [
-        "podman-compose-opencloud-root.target"
+        "podman-compose-drive-root.target"
       ];
     };
 
     # Networks
-    systemd.services."podman-network-opencloud_opencloud-net" = {
+    systemd.services."podman-network-drive_opencloud-net" = {
       path = [ pkgs.podman ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStop = "podman network rm -f opencloud_opencloud-net";
+        ExecStop = "podman network rm -f drive_opencloud-net";
       };
       script = ''
-        podman network inspect opencloud_opencloud-net || podman network create opencloud_opencloud-net
+        podman network inspect drive_opencloud-net || podman network create drive_opencloud-net
       '';
-      partOf = [ "podman-compose-opencloud-root.target" ];
-      wantedBy = [ "podman-compose-opencloud-root.target" ];
+      partOf = [ "podman-compose-drive-root.target" ];
+      wantedBy = [ "podman-compose-drive-root.target" ];
     };
 
     # Root service
     # When started, this will automatically create all resources and start
     # the containers. When stopped, this will teardown all resources.
-    systemd.targets."podman-compose-opencloud-root" = {
+    systemd.targets."podman-compose-drive-root" = {
       unitConfig = {
         Description = "Root target generated by compose2nix.";
       };
