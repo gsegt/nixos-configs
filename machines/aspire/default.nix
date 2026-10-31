@@ -57,6 +57,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/media-server";
     };
+    monitoring = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/monitoring";
+    };
     msmtp.enable = true;
     notes = {
       enable = true;

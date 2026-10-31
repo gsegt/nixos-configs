@@ -1,0 +1,63 @@
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+
+name: &name monitoring
+
+services:
+  grafana:
+    container_name: monitoring-grafana
+    image: docker.io/grafana/grafana:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+    ports:
+      - 3000:3000
+    volumes:
+      - /etc/nixos/modules/services/monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - /etc/nixos/modules/services/monitoring/grafana/dashboard-provider.yml:/etc/grafana/provisioning/dashboards/provider.yml:ro
+      - /etc/nixos/modules/services/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    labels:
+      - compose2nix.settings.sops.secrets=monitoring/grafana/env
+      - io.containers.autoupdate=registry
+
+  prometheus:
+    container_name: monitoring-prometheus
+    image: docker.io/prom/prometheus:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 9090:9090
+    volumes:
+      - /etc/nixos/modules/services/monitoring/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    labels:
+      - io.containers.autoupdate=registry
+
+  prometheus-node-exporter:
+    container_name: monitoring-prometheus-node-exporter
+    image: docker.io/prom/node-exporter:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 9100:9100
+    volumes:
+      - /:/host:ro,rslave
+    command:
+      - --path.rootfs=/host
+    network_mode: host
+    pid: host
+    labels:
+      - io.containers.autoupdate=registry
+
+volumes:
+  prometheus-data:
+    name: monitoring-prometheus-data
+
+networks:
+  default:
+    name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/monitoring/docker-compose.yml -output modules/services/monitoring/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/monitoring/default-debug.nix
