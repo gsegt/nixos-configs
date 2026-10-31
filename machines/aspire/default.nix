@@ -27,11 +27,9 @@ in
   modules.boot = {
     bootloader.enable = true;
     remote-unlock = {
-      enable = false;
+      enable = true;
       networkKernelModules = [ "r8169" ];
-      ip = "192.168.1.252";
-      gateway = "192.168.1.254";
-      mask = "255.255.255.0";
+      interface = "enp3s0";
     };
   };
 
