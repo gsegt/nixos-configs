@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(nix flake check:*)",
+      "Bash(nix flake show:*)",
+      "Bash(nix flake metadata:*)",
+      "Bash(nix eval:*)",
+      "Bash(nix search:*)",
+      "Bash(nix log:*)",
+      "Bash(nix why-depends:*)",
+      "Bash(nix build .#nixosConfigurations.*:*)",
+      "Bash(nixos-rebuild build:*)",
+      "Bash(nixos-rebuild dry-build:*)",
+      "Bash(nixos-rebuild dry-activate:*)",
+      "Bash(nixfmt:*)",
+      "Bash(nix run nixpkgs#nixfmt-tree:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git add:*)",
+      "Bash(git submodule status:*)"
+    ],
+    "ask": [
+      "Bash(sudo:*)",
+      "Bash(nixos-rebuild switch:*)",
+      "Bash(nixos-rebuild boot:*)",
+      "Bash(nixos-rebuild test:*)",
+      "Bash(nix flake update:*)",
+      "Bash(nix flake lock:*)",
+      "Bash(nix-collect-garbage:*)",
+      "Bash(nix store gc:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git submodule update:*)",
+      "Bash(sops:*)"
+    ],
+    "deny": [
+      "Read(/etc/secrets/**)",
+      "Read(/run/secrets/**)",
+      "Read(/run/secrets.d/**)",
+      "Read(~/.config/sops/**)",
+      "Read(~/.ssh/**)",
+      "Read(**/keys.txt)",
+      "Read(**/*.dec.*)",
+      "Bash(sops -d:*)",
+      "Bash(sops --decrypt:*)",
+      "Bash(sops decrypt:*)",
+      "Bash(nix run nixpkgs#sops:*)",
+      "Bash(nix shell nixpkgs#sops:*)",
+      "Bash(cat /etc/secrets/**)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(sed -n 's/.*\"file_path\" *: *\"\\([^\"]*\\.nix\\)\".*/\\1/p' | head -n1); [ -n \"$f\" ] && [ -f \"$f\" ] && nixfmt \"$f\" || true"
+          }
+        ]
+      }
+    ]
+  }
+}
