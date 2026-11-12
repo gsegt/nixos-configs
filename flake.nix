@@ -16,39 +16,50 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs-server";
     };
-    sops-nix-server.url = "github:Mic92/sops-nix";
-    sops-nix-server.inputs.nixpkgs.follows = "nixpkgs-server";
   };
 
   outputs =
     {
-      self,
       nixpkgs,
+      nixpkgs-server,
       home-manager,
+      home-manager-server,
       sops-nix,
       nixos-wsl,
-      nixpkgs-server,
-      home-manager-server,
-      sops-nix-server,
       ...
-    }:
+    }@inputs:
+    let
+      # Each host picks its nixpkgs channel and the matching home-manager release,
+      # everything else is shared. All flake inputs are available to modules as `inputs`.
+      mkHost =
+        {
+          nixpkgs,
+          home-manager,
+          modules,
+        }:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = [
+            home-manager.nixosModules.home-manager
+            sops-nix.nixosModules.sops
+          ]
+          ++ modules;
+        };
+    in
     {
-      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          home-manager.nixosModules.home-manager
-          sops-nix.nixosModules.sops
-          nixos-wsl.nixosModules.wsl
-          ./machines/wsl
-        ];
-      };
-      nixosConfigurations.aspire = nixpkgs-server.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          home-manager-server.nixosModules.home-manager
-          sops-nix-server.nixosModules.sops
-          ./machines/aspire
-        ];
+      nixosConfigurations = {
+        wsl = mkHost {
+          inherit nixpkgs home-manager;
+          modules = [
+            nixos-wsl.nixosModules.wsl
+            ./machines/wsl
+          ];
+        };
+        aspire = mkHost {
+          nixpkgs = nixpkgs-server;
+          home-manager = home-manager-server;
+          modules = [ ./machines/aspire ];
+        };
       };
     };
 }
