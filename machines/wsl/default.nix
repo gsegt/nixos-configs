@@ -19,4 +19,6 @@
     hostName = "wsl";
     timeZone = "Europe/Paris";
   };
+
+  modules.claude-code.enable = true;
 }

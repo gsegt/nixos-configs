@@ -11,6 +11,10 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-26.05-small";
     home-manager-server = {
       url = "github:nix-community/home-manager/release-26.05";
