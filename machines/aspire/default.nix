@@ -21,6 +21,7 @@ in
     uid = 1000;
     gid = config.modules.base.uid;
     hostName = "aspire";
+    ipAddress = "192.168.1.253";
     timeZone = "Europe/Paris";
   };
 

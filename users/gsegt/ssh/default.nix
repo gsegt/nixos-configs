@@ -1,3 +1,8 @@
+{ inputs, ... }:
+
+let
+  aspire = inputs.self.nixosConfigurations.aspire.config;
+in
 {
   programs.ssh = {
     enable = true;
@@ -9,13 +14,13 @@
         IdentitiesOnly = true;
       };
       "Host aspire" = {
-        HostName = "192.168.1.253";
-        User = "gsegt";
+        HostName = aspire.modules.base.ipAddress;
+        User = aspire.modules.base.userName;
         IdentityFile = "~/.ssh/servers";
         IdentitiesOnly = true;
       };
       "Host unlock-aspire" = {
-        HostName = "192.168.1.253";
+        HostName = aspire.modules.base.ipAddress;
         User = "root";
         IdentityFile = "~/.ssh/unlock-aspire";
         IdentitiesOnly = true;

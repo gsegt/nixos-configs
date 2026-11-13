@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   home-manager,
   sops,
   ...
@@ -48,6 +49,7 @@ in
       useGlobalPkgs = true;
       useUserPackages = true;
       extraSpecialArgs = {
+        inherit inputs;
         userName = config.modules.base.userName;
       };
       users.${config.modules.base.userName} = import ../../../users/${config.modules.base.userName};

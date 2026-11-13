@@ -40,6 +40,12 @@ in
       description = "Hostname of the current system.";
     };
 
+    ipAddress = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Fixed LAN IP address of the current system (e.g. a DHCP reservation), used by other hosts to reach it.";
+    };
+
     timeZone = lib.mkOption {
       type = lib.types.str;
       description = "Timezone of the current system.";
