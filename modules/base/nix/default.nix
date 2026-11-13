@@ -16,6 +16,8 @@ in
           "flakes"
         ];
         download-buffer-size = 536870912; # 512 MiB
+        # Allow wheel users to copy unsigned store paths, needed for remote deployments with --target-host.
+        trusted-users = [ "@wheel" ];
       };
       gc = {
         automatic = true;
