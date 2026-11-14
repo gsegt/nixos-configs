@@ -92,7 +92,15 @@ in
 
   modules.storage.zfs = {
     enable = true;
-    extraPools = [ "data-vault" ];
+    mounts = {
+      "/media/external/data-vault" = "data-vault";
+      "/media/external/data-vault/private" = "data-vault/private";
+      ${baseServicesDir} = "data-vault/services";
+    };
+    smbShares = {
+      data_vault_private = "/media/external/data-vault/private";
+      data_vault_services = baseServicesDir;
+    };
   };
 
   services.logind.settings.Login.HandleLidSwitch = "ignore";
