@@ -55,6 +55,8 @@ in
         "NTFY_CACHE_FILE" = "/var/lib/ntfy/cache.db";
         "NTFY_ENABLE_LOGIN" = "true";
         "NTFY_LISTEN_HTTP" = ":80";
+        # Web app shows only the login page until signed in
+        "NTFY_REQUIRE_LOGIN" = "true";
       };
       environmentFiles = [
         config.sops.secrets."notifications/ntfy/env".path
