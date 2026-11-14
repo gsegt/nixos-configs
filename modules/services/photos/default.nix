@@ -87,7 +87,7 @@ in
         "podman-compose-photos-root.target"
       ];
     };
-    virtualisation.oci-containers.containers."photos-server" = {
+    virtualisation.oci-containers.containers."photos-immich-server" = {
       image = "ghcr.io/immich-app/immich-server:release";
       environment = {
         "DB_DATABASE_NAME" = "immich";
