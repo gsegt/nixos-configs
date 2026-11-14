@@ -23,6 +23,19 @@ in
       dockerCompat = true;
     };
 
+    # Each container requires (and starts after) the mounts behind its host
+    # bind mounts, so it never starts on an empty mountpoint, e.g. before an
+    # encrypted ZFS dataset is unlocked and mounted.
+    systemd.services = lib.mapAttrs' (
+      _: container:
+      lib.nameValuePair container.serviceName {
+        unitConfig.RequiresMountsFor = lib.pipe container.volumes [
+          (map (volume: lib.head (lib.splitString ":" volume)))
+          (lib.filter (lib.hasPrefix "/"))
+        ];
+      }
+    ) config.virtualisation.oci-containers.containers;
+
     # Enable container name DNS for all Podman networks.
     networking.firewall.interfaces.${cfg.podmanInterfaces}.allowedUDPPorts = [ 53 ];
   };
