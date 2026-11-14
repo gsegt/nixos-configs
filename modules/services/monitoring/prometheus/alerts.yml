@@ -3,6 +3,22 @@
 # Test with: promtool check rules alerts.yml
 
 groups:
+  - name: records
+    rules:
+      # Usable space per ZFS pool, from its mounted datasets. Each dataset's
+      # size - avail is its own used space; avail is shared pool-wide and
+      # already excludes reservations held by other datasets.
+      - record: zpool:usable_used_bytes
+        expr: |
+          sum by (instance, zpool) (label_replace(
+            node_filesystem_size_bytes{fstype="zfs"} - node_filesystem_avail_bytes{fstype="zfs"},
+            "zpool", "$1", "device", "([^/]+).*"))
+      - record: zpool:usable_avail_bytes
+        expr: |
+          max by (instance, zpool) (label_replace(
+            node_filesystem_avail_bytes{fstype="zfs"},
+            "zpool", "$1", "device", "([^/]+).*"))
+
   - name: meta
     rules:
       # Always firing. Alertmanager pings healthchecks.io with it; if the pings
@@ -80,27 +96,29 @@ groups:
           summary: "No scrub of {{ $labels.zpool }} for {{ $value | humanizeDuration }}"
           description: "Check `systemctl status zfs-scrub.timer`."
 
+      # Pool usage is measured against usable space: what datasets can still
+      # write, i.e. after the <pool>/reserved free-space reservation (see
+      # modules/storage/zfs). Writes fail once usable space runs out.
       - alert: ZfsPoolAlmostFull
-        expr: zfs_vdev_space_allocated_bytes{vdev="root"} / zfs_vdev_space_capacity_bytes{vdev="root"} > 0.90
+        expr: zpool:usable_used_bytes / (zpool:usable_used_bytes + zpool:usable_avail_bytes) > 0.95
         for: 15m
         labels:
           severity: critical
         annotations:
           summary: "ZFS pool {{ $labels.zpool }} is {{ $value | humanizePercentage }} full"
-          description: "ZFS slows down sharply when nearly full. Free space or add capacity."
+          description: "Writes will soon fail with 'no space left'. Free space now, or shrink <pool>/reserved as a stopgap."
 
       - alert: ZfsPoolAlmostFull
-        # ZFS performance degrades above ~80% allocation.
-        expr: zfs_vdev_space_allocated_bytes{vdev="root"} / zfs_vdev_space_capacity_bytes{vdev="root"} > 0.80
+        expr: zpool:usable_used_bytes / (zpool:usable_used_bytes + zpool:usable_avail_bytes) > 0.90
         for: 15m
         labels:
           severity: warning
         annotations:
           summary: "ZFS pool {{ $labels.zpool }} is {{ $value | humanizePercentage }} full"
-          description: "ZFS performance degrades above 80%. Plan to free space or add capacity."
+          description: "Less than 10% of usable space left. Plan to free space or add capacity."
 
       - alert: ZfsPoolFillingUp
-        expr: predict_linear(zfs_vdev_space_allocated_bytes{vdev="root"}[12h], 7 * 86400) > zfs_vdev_space_capacity_bytes{vdev="root"}
+        expr: predict_linear(zpool:usable_avail_bytes[12h], 7 * 86400) < 0
         for: 1h
         labels:
           severity: warning

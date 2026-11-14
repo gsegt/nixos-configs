@@ -740,7 +740,7 @@
     {
       "id": 5,
       "type": "gauge",
-      "title": "$pool (ZFS)",
+      "title": "$pool usable (ZFS)",
       "gridPos": {
         "x": 18,
         "y": 4,
@@ -806,7 +806,8 @@
           }
         },
         "overrides": []
-      }
+      },
+      "description": "Share of usable space in use. Usable space excludes the $pool/reserved free-space reservation (see modules/storage/zfs); writes fail when this reaches 100%."
     },
     {
       "id": 6,
@@ -1161,7 +1162,7 @@
       "id": 9,
       "type": "bargauge",
       "title": "Storage usage",
-      "description": "System disk as a share of its own capacity; the pool and each of its datasets as a share of the whole pool.",
+      "description": "System disk as a share of its own capacity; the pool and each of its datasets as a share of the pool's usable space (excluding the free-space reservation).",
       "gridPos": {
         "x": 12,
         "y": 19,
@@ -1321,7 +1322,7 @@
     {
       "id": 11,
       "type": "stat",
-      "title": "$pool (ZFS)",
+      "title": "$pool usable (ZFS)",
       "gridPos": {
         "x": 12,
         "y": 28,
@@ -1360,7 +1361,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "expr": "sum(node_filesystem_size_bytes{instance=\"$instance\", fstype=\"zfs\", device=~\"$pool(/.*)?\"} - node_filesystem_avail_bytes{instance=\"$instance\", fstype=\"zfs\", device=~\"$pool(/.*)?\"}) + max(node_filesystem_avail_bytes{instance=\"$instance\", fstype=\"zfs\", device=\"$pool\"})",
-          "legendFormat": "Total",
+          "legendFormat": "Usable",
           "instant": true
         }
       ],
@@ -1386,7 +1387,8 @@
           "decimals": 1
         },
         "overrides": []
-      }
+      },
+      "description": "Usable = used + free, excluding the free-space reservation."
     },
     {
       "id": 18,
