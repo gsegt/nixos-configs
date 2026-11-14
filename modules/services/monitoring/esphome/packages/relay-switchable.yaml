@@ -1,0 +1,21 @@
+# Relay toggled by the button (and later by Home Assistant).
+
+switch:
+  - platform: gpio
+    id: relay
+    name: Relay
+    pin: GPIO15
+    # Keep the load powered after a power cut
+    restore_mode: RESTORE_DEFAULT_ON
+
+binary_sensor:
+  - platform: gpio
+    id: button
+    pin:
+      number: GPIO13
+      inverted: true
+      mode: INPUT_PULLUP
+    filters:
+      - delayed_on: 50ms
+    on_press:
+      - switch.toggle: relay

@@ -1,0 +1,9 @@
+# Relay forced on and internal (not exposed anywhere), with no button, so power
+# cannot be cut by accident.
+
+switch:
+  - platform: gpio
+    id: relay
+    pin: GPIO15
+    restore_mode: ALWAYS_ON
+    internal: true

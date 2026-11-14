@@ -1,0 +1,85 @@
+# Shared config for GHome EP2-A plugs (ESP8266, BL0937 power meter).
+# Pinout from https://templates.blakadder.com/ghome_EP2-A.html
+# Each plug file sets: name, friendly_name, address, voltage_divider,
+# current_resistor, and includes relay-switchable.yaml or relay-locked.yaml.
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
+
+logger:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # DHCP-reserved IP, used for OTA updates (Prometheus lists it too)
+  use_address: ${address}
+  ap:
+    ssid: ${name}
+    password: !secret ap_password
+
+captive_portal:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# Serves /metrics on port 80 for Prometheus. No web_server: it would put
+# /metrics behind its login, and the relay is controlled from the button only.
+prometheus:
+
+# Off in normal use; blinks only on warnings/errors (e.g. no Wi-Fi)
+status_led:
+  pin:
+    number: GPIO0
+    inverted: true
+
+# Power LED, held off: nothing turns it on regardless of the relay state
+output:
+  - platform: gpio
+    id: power_led
+    pin:
+      number: GPIO2
+      inverted: true
+
+sensor:
+  - platform: hlw8012
+    model: BL0937
+    sel_pin:
+      number: GPIO12
+      inverted: true
+    cf_pin: GPIO5
+    cf1_pin: GPIO4
+    # Calibrate per plug: voltage_divider scales voltage, current_resistor
+    # scales current (inversely); power follows both.
+    voltage_divider: ${voltage_divider}
+    current_resistor: ${current_resistor}
+    update_interval: 10s
+    # CF1 alternates between current and voltage
+    change_mode_every: 3
+    power:
+      name: Power
+      id: power
+    voltage:
+      name: Voltage
+    current:
+      name: Current
+    # Pulse counter since boot; resets on reboot (Prometheus increase() handles it)
+    energy:
+      name: Energy
+      unit_of_measurement: kWh
+      accuracy_decimals: 3
+      filters:
+        - multiply: 0.001
+
+  - platform: wifi_signal
+    name: Wi-Fi signal
+    update_interval: 60s
+
+  - platform: uptime
+    name: Uptime
+    update_interval: 60s

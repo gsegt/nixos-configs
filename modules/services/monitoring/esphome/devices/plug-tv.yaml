@@ -1,0 +1,12 @@
+substitutions:
+  name: plug-tv
+  friendly_name: TV setup
+  address: 192.168.1.247
+  # voltage_divider: calibrated to 230 V mains (was 1600, read 264.3 V)
+  # current_resistor: default, to be calibrated against a known load
+  voltage_divider: "1392"
+  current_resistor: "0.001"
+
+packages:
+  common: !include ../packages/common.yaml
+  relay: !include ../packages/relay-switchable.yaml

@@ -1,0 +1,12 @@
+substitutions:
+  name: plug-server
+  friendly_name: Server
+  address: 192.168.1.248
+  # voltage_divider: calibrated to 230 V mains (was 1600, read 277.8 V)
+  # current_resistor: default, to be calibrated against a known load
+  voltage_divider: "1325"
+  current_resistor: "0.001"
+
+packages:
+  common: !include ../packages/common.yaml
+  relay: !include ../packages/relay-locked.yaml

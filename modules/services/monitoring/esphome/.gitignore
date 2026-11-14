@@ -1,0 +1,4 @@
+# Local secrets; packages/secrets.yaml is a committed symlink to this file.
+# Build output (devices/.esphome/) is ignored by devices/.gitignore, which
+# ESPHome generates and keeps in the device config folder.
+/secrets.yaml

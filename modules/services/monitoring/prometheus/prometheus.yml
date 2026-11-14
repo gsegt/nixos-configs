@@ -28,3 +28,16 @@ scrape_configs:
     static_configs:
       - targets:
         - host.containers.internal:9100
+  - job_name: esphome
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+    scheme: http
+    # Plugs label their metrics with node="plug-<device>" themselves
+    static_configs:
+      - targets:
+        - 192.168.1.246 # plug-3d-printer
+        - 192.168.1.247 # plug-tv
+        - 192.168.1.248 # plug-server
+        - 192.168.1.249 # plug-desktop
