@@ -2137,7 +2137,7 @@
       "id": 29,
       "type": "table",
       "title": "SMART",
-      "description": "Reallocated sectors (SATA) and media errors (NVMe) should stay at 0; a rising count means the disk is failing. Wear is the NVMe's rated endurance used.",
+      "description": "Reallocated sectors (SATA) and media errors (NVMe) should stay at 0; a rising count means the disk is failing. Wear is the share of rated endurance used (SATA: from Wear_Leveling_Count or Percent_Lifetime_Remain).",
       "gridPos": {
         "x": 0,
         "y": 60,
@@ -2215,7 +2215,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "max by (device) (smartctl_device_percentage_used)",
+          "expr": "max by (device) (smartctl_device_percentage_used) or max by (device) (100 - smartctl_device_attribute{attribute_value_type=\"value\", attribute_name=~\"Wear_Leveling_Count|Percent_Lifetime_Remain\"})",
           "format": "table",
           "instant": true
         }
