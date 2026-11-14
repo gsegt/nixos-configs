@@ -11,6 +11,8 @@ let
   grafana_port = 3000;
   prometheus_ref_dir = "/etc/nixos/modules/services/monitoring/prometheus";
   prometheus_port = 9090;
+  alertmanager_ref_dir = "/etc/nixos/modules/services/monitoring/alertmanager";
+  alertmanager_port = 9093;
   blackbox_ref_dir = "/etc/nixos/modules/services/monitoring/blackbox";
   exporters = config.services.prometheus.exporters;
   cfg = config.modules.services.${service};
@@ -36,11 +38,30 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets = {
-      "monitoring/grafana/env" = { };
-    };
+    assertions = [
+      {
+        # Alertmanager reuses the msmtp SMTP password
+        assertion = config.modules.services.msmtp.enable;
+        message = "modules.services.monitoring needs modules.services.msmtp for alert emails.";
+      }
+    ];
+
+    sops.secrets =
+      let
+        # Alertmanager runs as nobody inside the container (same uid on the host)
+        alertmanagerSecret = {
+          owner = "nobody";
+          restartUnits = [ "podman-monitoring-alertmanager.service" ];
+        };
+      in
+      {
+        "monitoring/alertmanager/healthcheck_url" = alertmanagerSecret;
+        "monitoring/alertmanager/ntfy_token" = alertmanagerSecret;
+        "monitoring/grafana/env" = { };
+      };
 
     networking.firewall.allowedTCPPorts = [
+      alertmanager_port
       grafana_port
       prometheus_port
     ];
@@ -90,6 +111,7 @@ in
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
+      restartTriggers = [ ./blackbox/blackbox.yml ];
       after = [
         "podman-network-monitoring.service"
       ];
@@ -193,7 +215,11 @@ in
       ports = [
         "${toString prometheus_port}:9090/tcp"
       ];
-      cmd = [ "--config.file=/etc/prometheus/prometheus.yml" ];
+      cmd = [
+        "--config.file=/etc/prometheus/prometheus.yml"
+        # Links in alert emails point here instead of the container id
+        "--web.external-url=http://${config.modules.base.ipAddress}:${toString prometheus_port}"
+      ];
       labels = {
         "io.containers.autoupdate" = "registry";
       };
@@ -207,6 +233,11 @@ in
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
+      # Reload config and rules on switch (they are bind-mounted, not copied)
+      restartTriggers = [
+        ./prometheus/prometheus.yml
+        ./prometheus/alerts.yml
+      ];
       after = [
         "podman-network-monitoring.service"
         "podman-volume-monitoring-prometheus-data.service"
@@ -214,6 +245,57 @@ in
       requires = [
         "podman-network-monitoring.service"
         "podman-volume-monitoring-prometheus-data.service"
+      ];
+      partOf = [
+        "podman-compose-monitoring-root.target"
+      ];
+      wantedBy = [
+        "podman-compose-monitoring-root.target"
+      ];
+    };
+
+    virtualisation.oci-containers.containers."monitoring-alertmanager" = {
+      image = "docker.io/prom/alertmanager:latest";
+      volumes = [
+        "${alertmanager_ref_dir}/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro"
+        "monitoring-alertmanager-data:/alertmanager:rw"
+        "${config.sops.secrets."msmtp_default_password".path}:/etc/alertmanager/secrets/smtp_password:ro"
+        "${
+          config.sops.secrets."monitoring/alertmanager/ntfy_token".path
+        }:/etc/alertmanager/secrets/ntfy_token:ro"
+        "${
+          config.sops.secrets."monitoring/alertmanager/healthcheck_url".path
+        }:/etc/alertmanager/secrets/healthcheck_url:ro"
+      ];
+      ports = [
+        "${toString alertmanager_port}:9093/tcp"
+      ];
+      cmd = [
+        "--config.file=/etc/alertmanager/alertmanager.yml"
+        "--storage.path=/alertmanager"
+        "--web.external-url=http://${config.modules.base.ipAddress}:${toString alertmanager_port}"
+      ];
+      labels = {
+        "io.containers.autoupdate" = "registry";
+      };
+      log-driver = "journald";
+      extraOptions = [
+        "--network-alias=alertmanager"
+        "--network=monitoring"
+      ];
+    };
+    systemd.services."podman-monitoring-alertmanager" = {
+      serviceConfig = {
+        Restart = lib.mkOverride 90 "always";
+      };
+      restartTriggers = [ ./alertmanager/alertmanager.yml ];
+      after = [
+        "podman-network-monitoring.service"
+        "podman-volume-monitoring-alertmanager-data.service"
+      ];
+      requires = [
+        "podman-network-monitoring.service"
+        "podman-volume-monitoring-alertmanager-data.service"
       ];
       partOf = [
         "podman-compose-monitoring-root.target"
@@ -239,6 +321,18 @@ in
     };
 
     # Volumes
+    systemd.services."podman-volume-monitoring-alertmanager-data" = {
+      path = [ pkgs.podman ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        podman volume inspect monitoring-alertmanager-data || podman volume create monitoring-alertmanager-data
+      '';
+      partOf = [ "podman-compose-monitoring-root.target" ];
+      wantedBy = [ "podman-compose-monitoring-root.target" ];
+    };
     systemd.services."podman-volume-monitoring-prometheus-data" = {
       path = [ pkgs.podman ];
       serviceConfig = {

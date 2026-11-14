@@ -38,6 +38,26 @@ services:
       - compose2nix.settings.sops.secrets=monitoring/grafana/env
       - io.containers.autoupdate=registry
 
+  alertmanager:
+    container_name: monitoring-alertmanager
+    image: docker.io/prom/alertmanager:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    ports:
+      - 9093:9093
+    volumes:
+      - /etc/nixos/modules/services/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+      # Secret files, see the header of alertmanager.yml
+      - ./secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro
+      - ./secrets/ntfy_token:/etc/alertmanager/secrets/ntfy_token:ro
+      - ./secrets/healthcheck_url:/etc/alertmanager/secrets/healthcheck_url:ro
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    labels:
+      - io.containers.autoupdate=registry
+
   prometheus:
     container_name: monitoring-prometheus
     image: docker.io/prom/prometheus:latest
@@ -81,6 +101,8 @@ services:
       - io.containers.autoupdate=registry
 
 volumes:
+  alertmanager-data:
+    name: monitoring-alertmanager-data
   prometheus-data:
     name: monitoring-prometheus-data
 

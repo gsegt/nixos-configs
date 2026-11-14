@@ -1,0 +1,282 @@
+# Alert rules, loaded by prometheus.yml and routed by ../alertmanager/alertmanager.yml.
+# severity: critical -> email + ntfy push; warning -> email only.
+# Test with: promtool check rules alerts.yml
+
+groups:
+  - name: meta
+    rules:
+      # Always firing. Alertmanager pings healthchecks.io with it; if the pings
+      # stop (server, network or alerting down), healthchecks.io emails you.
+      - alert: Watchdog
+        expr: vector(1)
+        labels:
+          severity: none
+        annotations:
+          summary: Alerting pipeline heartbeat
+
+      - alert: TargetDown
+        # Plugs are excluded: unplugging one is not a problem.
+        expr: up{job!="esphome"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scrape target down: {{ $labels.job }}"
+          description: "{{ $labels.instance }} has not answered Prometheus for 10 minutes."
+
+      - alert: AlertmanagerNotificationsFailing
+        expr: rate(alertmanager_notifications_failed_total[10m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alertmanager cannot deliver via {{ $labels.integration }}"
+          description: "Check `journalctl -u podman-monitoring-alertmanager`."
+
+  - name: storage
+    rules:
+      - alert: ZfsPoolNotOnline
+        expr: node_zfs_zpool_state{state!="online"} == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ZFS pool {{ $labels.zpool }} is {{ $labels.state }}"
+          description: "The pool is RAIDZ1: one more disk failure loses data. Run `zpool status -v {{ $labels.zpool }}`."
+
+      - alert: ZfsDeviceNotOnline
+        # 7 = VDEV_STATE_HEALTHY
+        expr: zfs_vdev_state != 7
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ZFS device not online in {{ $labels.zpool }}"
+          description: "{{ $labels.vdev }} {{ $labels.path }} is in state {{ $value }}. Run `zpool status -v {{ $labels.zpool }}`."
+
+      - alert: ZfsDeviceErrors
+        # Counts persist until `zpool clear`, like in `zpool status`.
+        expr: zfs_vdev_errors{type=~"read|write|checksum"} > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "ZFS {{ $labels.type }} errors in {{ $labels.zpool }}"
+          description: "{{ $value }} {{ $labels.type }} errors on {{ $labels.vdev }} {{ $labels.path }}. Run `zpool status -v {{ $labels.zpool }}`, then `zpool clear` once resolved."
+
+      - alert: ZfsScrubErrors
+        expr: zfs_pool_scan_errors > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Last scrub of {{ $labels.zpool }} found {{ $value }} errors"
+          description: "Run `zpool status -v {{ $labels.zpool }}`."
+
+      - alert: ZfsScrubOverdue
+        # Scrubs run monthly (services.zfs.autoScrub).
+        expr: (time() - zfs_pool_scan_end_time_seconds > 40 * 86400) and zfs_pool_scan_state != 1
+        labels:
+          severity: warning
+        annotations:
+          summary: "No scrub of {{ $labels.zpool }} for {{ $value | humanizeDuration }}"
+          description: "Check `systemctl status zfs-scrub.timer`."
+
+      - alert: ZfsPoolAlmostFull
+        expr: zfs_vdev_space_allocated_bytes{vdev="root"} / zfs_vdev_space_capacity_bytes{vdev="root"} > 0.90
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ZFS pool {{ $labels.zpool }} is {{ $value | humanizePercentage }} full"
+          description: "ZFS slows down sharply when nearly full. Free space or add capacity."
+
+      - alert: ZfsPoolAlmostFull
+        # ZFS performance degrades above ~80% allocation.
+        expr: zfs_vdev_space_allocated_bytes{vdev="root"} / zfs_vdev_space_capacity_bytes{vdev="root"} > 0.80
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ZFS pool {{ $labels.zpool }} is {{ $value | humanizePercentage }} full"
+          description: "ZFS performance degrades above 80%. Plan to free space or add capacity."
+
+      - alert: ZfsPoolFillingUp
+        expr: predict_linear(zfs_vdev_space_allocated_bytes{vdev="root"}[12h], 7 * 86400) > zfs_vdev_space_capacity_bytes{vdev="root"}
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "ZFS pool {{ $labels.zpool }} will be full within 7 days"
+          description: "Based on the last 12 hours of growth."
+
+      - alert: FilesystemAlmostFull
+        expr: 1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} > 0.95
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "System disk is {{ $value | humanizePercentage }} full"
+          description: "Try `nix-collect-garbage -d` and `podman image prune -a`."
+
+      - alert: FilesystemAlmostFull
+        expr: 1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} > 0.85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "System disk is {{ $value | humanizePercentage }} full"
+          description: "Try `nix-collect-garbage -d` and `podman image prune -a`."
+
+      - alert: FilesystemFillingUp
+        expr: predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[12h], 7 * 86400) < 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "System disk will be full within 7 days"
+          description: "Based on the last 12 hours of growth."
+
+      - alert: SmartFailing
+        expr: smartctl_device_smart_status == 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "SMART health check failing on {{ $labels.device }}"
+          description: "Replace the disk. Run `smartctl -a /dev/{{ $labels.device }}`."
+
+      - alert: SmartErrorsIncreasing
+        expr: |
+          increase(smartctl_device_attribute{attribute_value_type="raw",
+            attribute_name=~"Reallocated_Sector_Ct|Reported_Uncorrect|Uncorrectable_Error_Cnt|Offline_Uncorrectable|CRC_Error_Count|UDMA_CRC_Error_Count"}[24h]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.attribute_name }} rising on {{ $labels.device }}"
+          description: "Up by {{ $value }} in 24 hours. CRC errors point to a cable or connection; the others to a failing disk. Run `smartctl -a /dev/{{ $labels.device }}`."
+
+      - alert: NvmeMediaErrorsIncreasing
+        expr: increase(smartctl_device_media_errors[24h]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "NVMe media errors rising on {{ $labels.device }}"
+          description: "Up by {{ $value }} in 24 hours. Run `smartctl -a /dev/{{ $labels.device }}`."
+
+      - alert: SsdWornOut
+        # SATA: normalised life remaining (100 = new). NVMe: endurance used.
+        expr: |
+          (100 - smartctl_device_attribute{attribute_value_type="value",
+            attribute_name=~"Wear_Leveling_Count|Percent_Lifetime_Remain"}) > 80
+          or smartctl_device_percentage_used > 80
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSD {{ $labels.device }} has used {{ $value }}% of its rated endurance"
+          description: "Plan a replacement."
+
+      - alert: DiskTooHot
+        expr: smartctl_device_temperature{temperature_type="current"} > 60
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.device }} is at {{ $value }} °C"
+          description: "Check airflow around the disks."
+
+  - name: power-and-thermal
+    rules:
+      - alert: OnBattery
+        expr: node_power_supply_online{power_supply="ACAD"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Server is running on battery
+          description: Mains power lost or the charger is unplugged.
+
+      - alert: BatteryLow
+        expr: |
+          node_power_supply_capacity{power_supply="BAT1"} < 30
+          and on (instance) node_power_supply_online{power_supply="ACAD"} == 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Battery at {{ $value }}% and not charging"
+          description: "Shut the server down cleanly before the battery runs out."
+
+      - alert: CpuTooHot
+        expr: max by (instance) (node_hwmon_temp_celsius{chip=~"platform_coretemp.*"}) > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CPU at {{ $value }} °C"
+          description: "Check the fan and vents; the CPU will throttle."
+
+  - name: services
+    rules:
+      - alert: WebsiteDown
+        expr: probe_success{job="blackbox"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} is down"
+          description: "Failing for 5 minutes (non-2xx answer, TLS error or timeout)."
+
+      - alert: TlsCertExpiringSoon
+        # Caddy renews at ~30 days left, so under 14 means renewal is failing.
+        expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 14 * 86400
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"
+          description: "Caddy renewal is failing. Check `journalctl -u caddy`."
+
+      - alert: SystemdUnitFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "systemd unit {{ $labels.name }} failed"
+          description: "Run `systemctl status {{ $labels.name }}`."
+
+      - alert: ContainerNotRunning
+        # 2 = running
+        expr: podman_container_state != 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} is not running"
+          description: "State {{ $value }} (0 created, 3 stopped, 4 paused, 5 exited). Check `journalctl -u podman-{{ $labels.name }}`."
+
+      - alert: ContainerRestarting
+        # Containers run with --rm, so each restart is a new container id.
+        expr: count by (name) (max_over_time(podman_container_info[1h])) > 3
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} keeps restarting"
+          description: "{{ $value }} separate runs in the last hour. Check `journalctl -u podman-{{ $labels.name }}`."
+
+      - alert: ContainerUnhealthy
+        expr: podman_container_health == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} is unhealthy"
+          description: "Its health check has been failing for 5 minutes."
+
+  - name: memory
+    rules:
+      - alert: LowMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Only {{ $value | humanizePercentage }} RAM available"
+          description: "Check the Container RAM panel for the biggest user."
