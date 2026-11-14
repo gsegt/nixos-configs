@@ -27,6 +27,14 @@ in
 
     services.zfs.autoScrub.enable = true;
 
+    # Free-space reserve (not declarative: NixOS does not manage dataset
+    # properties). Each pool keeps ~10% of its usable space in an empty,
+    # unmounted dataset so writes fail before the pool gets so full that
+    # performance degrades. Recreate it after rebuilding a pool:
+    #   zfs create -o reservation=0.9T -o mountpoint=none -o canmount=off data-vault/reserved
+    # Resize with `zfs set reservation=<size> <pool>/reserved`.
+    # Monitoring alerts on the remaining usable space (monitoring/prometheus/alerts.yml).
+
     systemd.services.zfs-load-keys = {
       description = "Load zfs encryption keys";
       wantedBy = [ "zfs-mount.service" ];
