@@ -41,3 +41,50 @@ scrape_configs:
         - 192.168.1.247 # plug-tv
         - 192.168.1.248 # plug-server
         - 192.168.1.249 # plug-desktop
+  - job_name: smartctl
+    honor_timestamps: true
+    # The exporter only re-reads SMART data once a minute
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+        - host.containers.internal:9633
+  - job_name: zfs
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+        - host.containers.internal:9700
+  - job_name: podman
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+        - podman-exporter:9882
+  - job_name: blackbox
+    honor_timestamps: true
+    scrape_interval: 60s
+    scrape_timeout: 15s
+    metrics_path: /probe
+    scheme: http
+    params:
+      module: [http_2xx]
+    # Targets are generated from the Caddy virtual hosts (see default.nix)
+    file_sd_configs:
+      - files:
+        - /etc/prometheus-file-sd/blackbox.json
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

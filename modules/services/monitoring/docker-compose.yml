@@ -1,3 +1,20 @@
+# Portable part of the monitoring stack: Prometheus, Grafana and the exporters
+# that need nothing from the host beyond a socket.
+#
+# Host agents run natively on the OS, not here (see default.nix). On another
+# OS, install these from its packages and keep the same ports so
+# prometheus.yml and the dashboards keep working:
+#   - node_exporter      :9100  with --collector.systemd
+#   - smartctl_exporter  :9633  needs raw disk access
+#   - zfs_exporter       :9700  github.com/siebenmann/zfs_exporter, --depth=2
+# Prometheus reaches them via host.containers.internal (host.docker.internal
+# under Docker).
+#
+# prometheus/prometheus.yml reads blackbox targets from
+# /etc/prometheus-file-sd/blackbox.json, which default.nix generates from the
+# Caddy virtual hosts. Elsewhere, mount a hand-written file there:
+#   [{"targets": ["https://photos.example.com", ...]}]
+
 x-restart: &restart unless-stopped
 x-pull_policy: &pull_policy always
 
@@ -36,19 +53,30 @@ services:
     labels:
       - io.containers.autoupdate=registry
 
-  prometheus-node-exporter:
-    container_name: monitoring-prometheus-node-exporter
-    image: docker.io/prom/node-exporter:latest
+  blackbox-exporter:
+    container_name: monitoring-blackbox-exporter
+    image: docker.io/prom/blackbox-exporter:latest
     pull_policy: *pull_policy
     restart: *restart
-    ports:
-      - 9100:9100
     volumes:
-      - /:/host:ro,rslave
+      - /etc/nixos/modules/services/monitoring/blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     command:
-      - --path.rootfs=/host
-    network_mode: host
-    pid: host
+      - --config.file=/etc/blackbox_exporter/config.yml
+    labels:
+      - io.containers.autoupdate=registry
+
+  podman-exporter:
+    container_name: monitoring-podman-exporter
+    image: quay.io/navidys/prometheus-podman-exporter:v1.21.2
+    pull_policy: *pull_policy
+    restart: *restart
+    user: root
+    environment:
+      CONTAINER_HOST: unix:///run/podman/podman.sock
+    volumes:
+      - /run/podman/podman.sock:/run/podman/podman.sock:ro
+    command:
+      - --collector.enhance-metrics
     labels:
       - io.containers.autoupdate=registry
 
