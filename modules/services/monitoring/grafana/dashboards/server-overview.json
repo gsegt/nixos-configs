@@ -1,6 +1,6 @@
 {
-  "title": "btop-style System Monitor",
-  "uid": "btop-system",
+  "title": "Server overview",
+  "uid": "server-overview",
   "description": "Status, CPU, RAM, storage, pressure, disk and network, plus websites, containers, systemd units, SMART and ZFS health.",
   "tags": [
     "node-exporter",
