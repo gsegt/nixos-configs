@@ -67,6 +67,10 @@ in
       enable = true;
       volumeDir = "${baseServicesDir}/notes";
     };
+    notifications = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/notifications";
+    };
     password-manager = {
       enable = true;
       volumeDir = "${baseServicesDir}/password-manager";

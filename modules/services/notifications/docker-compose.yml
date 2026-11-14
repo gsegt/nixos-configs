@@ -1,0 +1,31 @@
+name: &name notifications
+
+services:
+  ntfy:
+    container_name: notifications-ntfy
+    image: docker.io/binwiederhier/ntfy:latest
+    pull_policy: always
+    restart: unless-stopped
+    command:
+      - serve
+    environment:
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_AUTH_FILE: /var/lib/ntfy/auth.db
+      NTFY_BASE_URL: https://notifications.gsegt.eu
+      NTFY_BEHIND_PROXY: true
+      NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
+      NTFY_ENABLE_LOGIN: true
+      NTFY_LISTEN_HTTP: :80
+    volumes:
+     - /media/external/data-vault/services/notifications/ntfy:/var/lib/ntfy
+    ports:
+     - 127.0.0.1:2586:80
+    labels:
+      - compose2nix.settings.sops.secrets=notifications/ntfy/env
+      - io.containers.autoupdate=registry
+
+networks:
+ default:
+   name: *name
+
+# sudo nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/notifications/docker-compose.yml -output modules/services/notifications/default-debug.nix --sops_file /etc/nixos/secrets/default.yaml && sudo chown gsegt:gsegt modules/services/notifications/default-debug.nix
