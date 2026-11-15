@@ -10,6 +10,7 @@ keys.txt
 
 # debug
 *debug*
+!/.claude/skills/server-debug/
 
 # build outputs and GC roots created by the justfile
 result
