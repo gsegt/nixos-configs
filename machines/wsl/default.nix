@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [ ../../modules ];
@@ -21,4 +21,15 @@
   };
 
   modules.claude-code.enable = true;
+
+  # Tools for working on this flake (see the justfile)
+  environment.systemPackages = with pkgs; [
+    just
+    nvd
+  ];
+
+  programs.nh = {
+    enable = true;
+    flake = "/etc/nixos";
+  };
 }
