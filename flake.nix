@@ -51,6 +51,9 @@
         };
     in
     {
+      # `nix fmt` (and `just fmt`); CI checks the same tool with `nix fmt -- --ci`.
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+
       nixosConfigurations = {
         wsl = mkHost {
           inherit nixpkgs home-manager;
