@@ -2,19 +2,27 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(nix flake check:*)",
+      "Bash(just)",
+      "Bash(just --list)",
+      "Bash(just check)",
+      "Bash(just build:*)",
+      "Bash(just build-all)",
+      "Bash(just diff:*)",
+      "Bash(just fmt)",
+      "Bash(just logs:*)",
+      "Bash(just status:*)",
+      "Bash(nix eval:*)",
       "Bash(nix flake show:*)",
       "Bash(nix flake metadata:*)",
-      "Bash(nix eval:*)",
+      "Bash(nix flake check:*)",
       "Bash(nix search:*)",
       "Bash(nix log:*)",
       "Bash(nix why-depends:*)",
       "Bash(nix build .#nixosConfigurations.*:*)",
       "Bash(nixos-rebuild build:*)",
       "Bash(nixos-rebuild dry-build:*)",
-      "Bash(nixos-rebuild dry-activate:*)",
+      "Bash(nvd:*)",
       "Bash(nixfmt:*)",
-      "Bash(nix run nixpkgs#nixfmt-tree:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -24,7 +32,13 @@
       "Bash(git submodule status:*)"
     ],
     "ask": [
-      "Bash(sudo:*)",
+      "Bash(just update:*)",
+      "Bash(just deploy-wsl)",
+      "Bash(just deploy-server)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(nix copy:*)",
+      "Bash(nh:*)",
       "Bash(nixos-rebuild switch:*)",
       "Bash(nixos-rebuild boot:*)",
       "Bash(nixos-rebuild test:*)",
@@ -38,19 +52,25 @@
       "Bash(sops:*)"
     ],
     "deny": [
+      "Bash(sudo:*)",
+      "Bash(doas:*)",
+      "Bash(run0:*)",
+      "Read(~/.ssh/**)",
+      "Bash(cat ~/.ssh/**)",
       "Read(/etc/secrets/**)",
       "Read(/run/secrets/**)",
       "Read(/run/secrets.d/**)",
       "Read(~/.config/sops/**)",
-      "Read(~/.ssh/**)",
       "Read(**/keys.txt)",
       "Read(**/*.dec.*)",
+      "Read(**/esphome/secrets.yaml)",
+      "Read(**/esphome/packages/secrets.yaml)",
+      "Bash(cat /etc/secrets/**)",
       "Bash(sops -d:*)",
       "Bash(sops --decrypt:*)",
       "Bash(sops decrypt:*)",
       "Bash(nix run nixpkgs#sops:*)",
       "Bash(nix shell nixpkgs#sops:*)",
-      "Bash(cat /etc/secrets/**)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ]
@@ -62,7 +82,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(sed -n 's/.*\"file_path\" *: *\"\\([^\"]*\\.nix\\)\".*/\\1/p' | head -n1); [ -n \"$f\" ] && [ -f \"$f\" ] && nixfmt \"$f\" || true"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/nixfmt.sh"
           }
         ]
       }
