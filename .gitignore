@@ -10,3 +10,8 @@ keys.txt
 
 # debug
 *debug*
+
+# build outputs and GC roots created by the justfile
+result
+result-*
+current-*
