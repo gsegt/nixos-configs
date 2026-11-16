@@ -14,6 +14,7 @@ NixOS flake for two hosts, both built from this WSL machine. See README.md for a
 - **Both hosts**: `flake.nix`, `flake.lock`, `utils/`, `modules/default.nix`, `modules/base/**` (nix, sops, home-manager, editor, zram, …), `users/gsegt/**`.
 - **`aspire` only**: `machines/aspire/`, `modules/{boot,containers,networking,services,storage}/**`.
 - **`wsl` only**: `machines/wsl/`, `modules/claude-code/`.
+- **Neither**: `esphome/` is firmware for the smart plugs, not Nix (see its README); it needs no build.
 
 **A change to anything shared means `just build-all`.** When unsure, build all.
 
@@ -31,7 +32,7 @@ The `nix-verify` skill runs this sequence and reports per host. Flakes only see 
 
 - **Never deploy.** Don't run `just deploy-*`, `nh os switch`, `nixos-rebuild switch/boot/test`, or `just update` unless asked; the user deploys.
 - **Never use `sudo`**, and never change the server directly: on `aspire`, only `just logs` / `just status` (read-only). Fixes go into this repo.
-- **Never touch secrets.** `secrets/default.yaml` is sops-encrypted: never decrypt it or read the age key (`/etc/secrets/sops/age/keys.txt`), `/run/secrets`, `~/.ssh`, or the git-ignored `modules/services/monitoring/esphome/secrets.yaml` (also reachable through the `packages/secrets.yaml` symlink). To add a secret, ask the user to run `sops secrets/default.yaml` (keys in alphabetical order).
+- **Never touch secrets.** `secrets/default.yaml` is sops-encrypted: never decrypt it or read the age key (`/etc/secrets/sops/age/keys.txt`), `/run/secrets`, `~/.ssh`, or the git-ignored `esphome/secrets.yaml` (also reachable through the `packages/secrets.yaml` symlink). To add a secret, ask the user to run `sops secrets/default.yaml` (keys in alphabetical order).
 
 ## Conventions
 
