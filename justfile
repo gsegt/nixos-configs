@@ -108,8 +108,24 @@ update *INPUTS:
 deploy-wsl:
     nh os switch --ask --hostname wsl .
 
-# Build locally and switch the server to the current config
+# Pull the repo on the server, then build locally and switch the server to the current config
 deploy-server:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Containers bind-mount config files from the server's own checkout
+    # (e.g. monitoring, dav, drive's submodule, home-assistant), not from the
+    # store, so it must be at the commit being deployed before switching.
+    if [[ -n "$(git status --porcelain)" ]]; then
+        echo "warning: uncommitted changes are built, but files mounted from the server's checkout will not include them" >&2
+    fi
+    echo "Pulling /etc/nixos on {{ server }}..." >&2
+    ssh {{ server }} -- git -C /etc/nixos pull --ff-only --recurse-submodules
+    local_head=$(git rev-parse HEAD)
+    server_head=$(ssh {{ server }} -- git -C /etc/nixos rev-parse HEAD)
+    if [[ "$local_head" != "$server_head" ]]; then
+        echo "{{ server }} is at $server_head after pulling, but local HEAD is $local_head: push first" >&2
+        exit 1
+    fi
     nh os switch --ask --hostname {{ server }} --target-host {{ server }} --elevation-strategy passwordless .
 
 # Read-only: last LINES journal lines of a server unit (globs allowed, e.g. 'podman-notes-*')
