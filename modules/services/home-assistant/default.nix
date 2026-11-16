@@ -30,16 +30,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Home Assistant runs as root inside the container
+    # Root-owned paths below are created by the container unit (preStart):
+    # tmpfiles refuses to create them under volumeDir, which the user owns
+    # ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${home_assistant_volume_dir} 0755 root root - -"
-      "d ${home_assistant_config_dir} 0755 root root - -"
-      # Included by configuration.yaml and written by the UI editors; only
-      # created when missing, never overwritten.
-      "f ${home_assistant_config_dir}/automations.yaml 0644 root root - []"
-      "f ${home_assistant_config_dir}/scripts.yaml 0644 root root - -"
-      "f ${home_assistant_config_dir}/scenes.yaml 0644 root root - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -78,6 +73,16 @@ in
       };
       # Reload config on switch (it is bind-mounted, not copied)
       restartTriggers = [ ./home-assistant/configuration.yaml ];
+      # Home Assistant runs as root inside the container. configuration.yaml
+      # includes these files, which the UI editors write; without them it
+      # starts in recovery mode. Only created when missing, never overwritten.
+      preStart = ''
+        mkdir -p ${home_assistant_config_dir}
+        [ -e ${home_assistant_config_dir}/automations.yaml ] || echo '[]' > ${home_assistant_config_dir}/automations.yaml
+        for f in scripts scenes; do
+          [ -e ${home_assistant_config_dir}/$f.yaml ] || : > ${home_assistant_config_dir}/$f.yaml
+        done
+      '';
       after = [
         "podman-network-home-assistant.service"
       ];
