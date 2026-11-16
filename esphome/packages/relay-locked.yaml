@@ -1,5 +1,5 @@
-# Relay forced on and internal (not exposed anywhere), with no button, so power
-# cannot be cut by accident.
+# Relay forced on and internal (not exposed anywhere, Home Assistant
+# included), with no button, so power cannot be cut by accident.
 
 switch:
   - platform: gpio

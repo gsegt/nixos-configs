@@ -1,6 +1,6 @@
 # Shared config for GHome EP2-A plugs (ESP8266, BL0937 power meter).
 # Pinout from https://templates.blakadder.com/ghome_EP2-A.html
-# Each plug file sets: name, friendly_name, address, voltage_divider,
+# Each plug file sets: name, friendly_name, address, api_key, voltage_divider,
 # current_resistor, and includes relay-switchable.yaml or relay-locked.yaml.
 
 esphome:
@@ -28,8 +28,18 @@ ota:
   - platform: esphome
     password: !secret ota_password
 
+# Native API (port 6053) for Home Assistant, encrypted with a per-plug key.
+api:
+  encryption:
+    key: ${api_key}
+  # By default the plug reboots after 15 min without a Home Assistant
+  # connection. A reboot cuts power to the load (the server itself for
+  # plug-server), so never reboot: the plug keeps working on its own.
+  reboot_timeout: 0s
+
 # Serves /metrics on port 80 for Prometheus. No web_server: it would put
-# /metrics behind its login, and the relay is controlled from the button only.
+# /metrics behind its login, and the relay is controlled from the button
+# and Home Assistant.
 prometheus:
 
 # Off in normal use; blinks only on warnings/errors (e.g. no Wi-Fi)

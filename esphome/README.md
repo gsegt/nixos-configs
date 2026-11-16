@@ -1,15 +1,20 @@
 # ESPHome power-monitoring plugs
 
-GHome EP2-A plugs (ESP8266 + BL0937) running ESPHome, scraped by Prometheus
-through their `/metrics` endpoint (`esphome` job in `../prometheus/prometheus.yml`).
+GHome EP2-A plugs (ESP8266 + BL0937) running ESPHome. This is device firmware,
+not NixOS config: nothing in the flake imports it.
+
+- **Prometheus** scrapes their `/metrics` endpoint (`esphome` job in
+  `modules/services/monitoring/prometheus/prometheus.yml`).
+- **Home Assistant** (`modules/services/home-assistant`) talks to them over the
+  encrypted native API (port 6053), one key per plug.
 
 ```
 esphome/
-├── devices/          one file per plug: name, IP, calibration, relay mode
+├── devices/          one file per plug: name, IP, API key, calibration, relay mode
 ├── packages/         shared config included by every device
-│   ├── common.yaml           board, Wi-Fi, OTA, LEDs, power sensors, /metrics
-│   ├── relay-switchable.yaml relay toggled by the button
-│   ├── relay-locked.yaml     relay forced on, no button (plug-server)
+│   ├── common.yaml           board, Wi-Fi, OTA, API, LEDs, power sensors, /metrics
+│   ├── relay-switchable.yaml relay toggled by the button and Home Assistant
+│   ├── relay-locked.yaml     relay forced on, no button, hidden (plug-server)
 │   └── secrets.yaml          symlink to ../secrets.yaml (ESPHome looks here)
 ├── scripts/
 │   ├── build-firmware.sh     first flash: .bin.gz to upload through Tasmota
@@ -27,11 +32,19 @@ esphome/
 
 IPs are DHCP reservations; keep `devices/*.yaml` and `prometheus.yml` in sync.
 
+The API's `reboot_timeout` is disabled: by default a plug reboots after 15 min
+without Home Assistant, which would cut power to its load (for plug-server, the
+server running Home Assistant).
+
 ## Adding a plug
 
-1. Copy a file in `devices/`, set `name`, `friendly_name`, `address` and the relay package.
-2. `scripts/build-firmware.sh plug-<name>`, then upload the `.bin.gz` through Tasmota.
-3. Add the IP to the `esphome` job in `prometheus.yml`.
+1. Copy a file in `devices/`, set `name`, `friendly_name`, `address`, the
+   `api_key` secret name and the relay package.
+2. Add `plug_<name>_api_key` to `secrets.yaml` (`head -c 32 /dev/urandom | base64`).
+3. `scripts/build-firmware.sh plug-<name>`, then upload the `.bin.gz` through Tasmota.
+4. Add the IP to the `esphome` job in `prometheus.yml`.
+5. In Home Assistant: Settings → Devices & services → Add integration →
+   ESPHome, enter the IP, then the plug's API key.
 
 ## Calibration
 

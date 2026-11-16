@@ -1,4 +1,4 @@
-# Relay toggled by the button (and later by Home Assistant).
+# Relay toggled by the button and by Home Assistant.
 
 switch:
   - platform: gpio

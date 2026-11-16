@@ -78,6 +78,11 @@ This NixOS configuration repository is organized to support modular, maintainabl
 - Utility functions for module management.
 - Example: `importSubmodules.nix` automates importing all submodules in a directory.
 
+#### 1.1.6. ESPHome (`esphome/`)
+
+- Firmware for the power-monitoring smart plugs, not NixOS config: nothing in the flake imports it.
+- Scraped by Prometheus (`modules/services/monitoring`) and controlled by Home Assistant (`modules/services/home-assistant`); see `esphome/README.md`.
+
 #### 1.1.6. Secrets Management (`secrets/`)
 
 - Secrets are managed using [SOPS](https://github.com/getsops/sops), [age](https://github.com/FiloSottile/age), and the [sops-nix](https://github.com/Mic92/sops-nix) framework.
