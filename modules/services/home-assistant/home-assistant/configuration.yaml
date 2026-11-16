@@ -1,0 +1,24 @@
+# Mounted read-only over /config/configuration.yaml. Settings made in the UI
+# (integrations, users, dashboards, automations) are stored in the writable
+# /config volume instead. The ESPHome plugs are added from the UI: Settings →
+# Devices & services → Add integration → ESPHome (see esphome/README.md).
+
+# Default integrations (frontend, history, logbook, mobile app, ...)
+default_config:
+
+homeassistant:
+  # Keep in sync with the domain in default.nix
+  external_url: https://home.gsegt.eu
+
+# Behind the reverse proxy: trust X-Forwarded-For from the container network
+# (the proxy reaches the container from its gateway). Keep the subnet in sync
+# with default.nix.
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 10.89.100.0/24
+
+# Written by the UI editors; default.nix creates these files when missing.
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

@@ -1,0 +1,37 @@
+# Home Assistant, reached at https://home.gsegt.eu through the reverse proxy.
+#
+# home-assistant/configuration.yaml is mounted read-only from this repo;
+# everything set up in the UI (integrations such as the ESPHome plugs, users,
+# dashboards) lives in the writable /config volume. The plugs' firmware is in
+# esphome/ at the root of the repo.
+#
+# The network subnet is pinned because configuration.yaml trusts it as the
+# proxy: requests from the host-side reverse proxy reach the container from
+# the bridge gateway.
+
+name: &name home-assistant
+
+services:
+  home-assistant:
+    container_name: home-assistant-home-assistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /media/external/data-vault/services/home-assistant/home-assistant/config:/config
+      - /etc/nixos/modules/services/home-assistant/home-assistant/configuration.yaml:/config/configuration.yaml:ro
+    ports:
+      - 8123:8123
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+    ipam:
+      config:
+        - subnet: 10.89.100.0/24
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/home-assistant/docker-compose.yml -output modules/services/home-assistant/default-debug.nix
