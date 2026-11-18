@@ -28,10 +28,11 @@ in
   config = lib.mkIf cfg.enable {
     sops.secrets."password-manager/vaultwarden/env" = { };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${vaultwarden_volume_dir} 0755 ${toString vaultwarden_uid} ${toString vaultwarden_gid} - -"
-      "d ${vaultwarden_data_dir} 0755 ${toString vaultwarden_uid} ${toString vaultwarden_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -76,6 +77,11 @@ in
       ];
     };
     systemd.services."podman-password-manager-vaultwarden" = {
+      preStart = ''
+        for d in ${vaultwarden_volume_dir} ${vaultwarden_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString vaultwarden_uid} -g ${toString vaultwarden_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
