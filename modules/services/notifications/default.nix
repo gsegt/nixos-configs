@@ -30,9 +30,11 @@ in
       restartUnits = [ "podman-notifications-ntfy.service" ];
     };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${ntfy_volume_dir} 0755 ${toString ntfy_uid} ${toString ntfy_gid} - -"
     ];
 
     # Caddy proxies WebSockets (used by the Android app) without extra config
@@ -79,6 +81,11 @@ in
       ];
     };
     systemd.services."podman-notifications-ntfy" = {
+      preStart = ''
+        for d in ${ntfy_volume_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString ntfy_uid} -g ${toString ntfy_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
