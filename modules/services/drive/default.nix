@@ -36,11 +36,11 @@ in
       "drive/euro-office/env" = { };
     };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${opencloud_volume_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
-      "d ${opencloud_data_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
-      "d ${opencloud_config_dir} 0755 ${toString opencloud_uid} ${toString opencloud_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -190,6 +190,11 @@ in
       ];
     };
     systemd.services."podman-drive-opencloud" = {
+      preStart = ''
+        for d in ${opencloud_volume_dir} ${opencloud_config_dir} ${opencloud_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString opencloud_uid} -g ${toString opencloud_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
