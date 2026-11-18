@@ -26,10 +26,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${mealie_volume_dir} 0755 ${toString mealie_uid} ${toString mealie_gid} - -"
-      "d ${mealie_data_dir} 0755 ${toString mealie_uid} ${toString mealie_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -65,6 +66,11 @@ in
       ];
     };
     systemd.services."podman-mealie" = {
+      preStart = ''
+        for d in ${mealie_volume_dir} ${mealie_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString mealie_uid} -g ${toString mealie_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
