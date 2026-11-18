@@ -32,7 +32,7 @@ The `nix-verify` skill runs this sequence and reports per host. Flakes only see 
 
 - **Never deploy.** Don't run `just deploy-*`, `nh os switch`, `nixos-rebuild switch/boot/test`, or `just update` unless asked; the user deploys.
 - **Never use `sudo`**, and never change the server directly: on `aspire`, only `just logs` / `just status` (read-only). Fixes go into this repo.
-- **Never touch secrets.** `secrets/default.yaml` is sops-encrypted: never decrypt it or read the age key (`/etc/secrets/sops/age/keys.txt`), `/run/secrets`, `~/.ssh`, or the git-ignored `esphome/secrets.yaml` (also reachable through the `packages/secrets.yaml` symlink). To add a secret, ask the user to run `sops secrets/default.yaml` (keys in alphabetical order).
+- **Never touch secrets.** `secrets/default.yaml` is sops-encrypted: never decrypt it or read the age key (`/etc/secrets/sops/age/keys.txt`), `/run/secrets`, `~/.ssh`, or the git-ignored `esphome/secrets.yaml` (also reachable through the `devices/secrets.yaml` symlink). To add a secret, ask the user to run `sops secrets/default.yaml` (keys in alphabetical order).
 
 ## Conventions
 

@@ -64,7 +64,7 @@
       "Read(**/keys.txt)",
       "Read(**/*.dec.*)",
       "Read(**/esphome/secrets.yaml)",
-      "Read(**/esphome/packages/secrets.yaml)",
+      "Read(**/esphome/*/secrets.yaml)",
       "Bash(cat /etc/secrets/**)",
       "Bash(sops -d:*)",
       "Bash(sops --decrypt:*)",

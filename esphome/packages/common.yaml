@@ -18,15 +18,21 @@ wifi:
   password: !secret wifi_password
   # DHCP-reserved IP, used for OTA updates (Prometheus lists it too)
   use_address: ${address}
+  # Fallback hotspot when Wi-Fi is unreachable; the plug is then at
+  # 192.168.4.1 for (encrypted) OTA updates.
   ap:
     ssid: ${name}
     password: !secret ap_password
 
-captive_portal:
+# No captive_portal: its plaintext /update endpoint stays reachable on the LAN
+# (the /metrics listener keeps it up) and accepts firmware without any auth.
+# To change Wi-Fi, update secrets.yaml and flash before switching the router.
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    # Uploads must be encrypted with the plug's api key (a bare block inherits
+    # it); the key also authenticates the uploader, so no password.
+    encryption:
 
 # Native API (port 6053) for Home Assistant, encrypted with a per-plug key.
 api:

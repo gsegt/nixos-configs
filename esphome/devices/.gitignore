@@ -1,5 +1,4 @@
 # Gitignore settings for ESPHome
-# This is an example and may include too much for your use-case.
-# You can modify this file to suit your needs.
 /.esphome/
-/secrets.yaml
+# secrets.yaml here is a committed symlink to ../secrets.yaml (ESPHome reads
+# secrets next to the device config); the real file is ignored by ../.gitignore.

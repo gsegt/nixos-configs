@@ -11,11 +11,11 @@ not NixOS config: nothing in the flake imports it.
 ```
 esphome/
 ├── devices/          one file per plug: name, IP, API key, calibration, relay mode
+│   └── secrets.yaml          symlink to ../secrets.yaml (ESPHome looks here)
 ├── packages/         shared config included by every device
 │   ├── common.yaml           board, Wi-Fi, OTA, API, LEDs, power sensors, /metrics
 │   ├── relay-switchable.yaml relay toggled by the button and Home Assistant
-│   ├── relay-locked.yaml     relay forced on, no button, hidden (plug-server)
-│   └── secrets.yaml          symlink to ../secrets.yaml (ESPHome looks here)
+│   └── relay-locked.yaml     relay forced on, no button, hidden (plug-server)
 ├── scripts/
 │   ├── build-firmware.sh     first flash: .bin.gz to upload through Tasmota
 │   └── ota-update.sh         later updates over Wi-Fi
@@ -53,3 +53,7 @@ server running Home Assistant).
   load (kettle, heater).
 
 Updating a plug reboots it, which briefly cuts power to its load.
+
+There is no captive portal: its plaintext `/update` page would accept firmware
+from anyone on the LAN. To change Wi-Fi, update `secrets.yaml` and flash every
+plug before switching the router.
