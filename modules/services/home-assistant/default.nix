@@ -13,6 +13,8 @@ let
   home_assistant_ref_dir = "/etc/nixos/modules/services/${service}/home-assistant";
   home_assistant_volume_dir = "${cfg.volumeDir}/home-assistant";
   home_assistant_config_dir = "${home_assistant_volume_dir}/config";
+  home_assistant_uid = 0;
+  home_assistant_gid = 0;
   home_assistant_port = 8123;
   # Pinned so Home Assistant can trust the reverse proxy, which reaches the
   # container from this network's gateway. Keep in sync with the trusted
@@ -30,9 +32,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Root-owned paths below are created by the container unit (preStart):
-    # tmpfiles refuses to create them under volumeDir, which the user owns
-    # ("unsafe path transition").
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
     ];
@@ -77,7 +79,9 @@ in
       # includes these files, which the UI editors write; without them it
       # starts in recovery mode. Only created when missing, never overwritten.
       preStart = ''
-        mkdir -p ${home_assistant_config_dir}
+        for d in ${home_assistant_volume_dir} ${home_assistant_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString home_assistant_uid} -g ${toString home_assistant_gid} "$d"
+        done
         [ -e ${home_assistant_config_dir}/automations.yaml ] || echo '[]' > ${home_assistant_config_dir}/automations.yaml
         for f in scripts scenes; do
           [ -e ${home_assistant_config_dir}/$f.yaml ] || : > ${home_assistant_config_dir}/$f.yaml
