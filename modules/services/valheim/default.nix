@@ -45,14 +45,11 @@ in
       "valheim/overc-loc/env" = { };
     };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${valheim_harmless_midock_volume_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
-      "d ${valheim_harmless_midock_server_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
-      "d ${valheim_harmless_midock_saves_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
-      "d ${valheim_overc_loc_volume_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
-      "d ${valheim_overc_loc_server_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
-      "d ${valheim_overc_loc_saves_dir} 0755 ${toString valheim_uid} ${toString valheim_gid} - -"
     ];
 
     networking.firewall.allowedUDPPorts = valheim_harmless_midock_ports ++ valheim_overc_loc_ports;
@@ -96,6 +93,11 @@ in
       ];
     };
     systemd.services."podman-valheim-harmless-midock" = {
+      preStart = ''
+        for d in ${valheim_harmless_midock_volume_dir} ${valheim_harmless_midock_server_dir} ${valheim_harmless_midock_saves_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString valheim_uid} -g ${toString valheim_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -150,6 +152,11 @@ in
       ];
     };
     systemd.services."podman-valheim-overc-loc" = {
+      preStart = ''
+        for d in ${valheim_overc_loc_volume_dir} ${valheim_overc_loc_server_dir} ${valheim_overc_loc_saves_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString valheim_uid} -g ${toString valheim_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
