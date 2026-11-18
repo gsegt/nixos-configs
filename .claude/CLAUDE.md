@@ -38,6 +38,15 @@ The `nix-verify` skill runs this sequence and reports per host. Flakes only see 
 
 - Module pattern: `modules/<category>/<name>/default.nix` declares `options.modules.<category>.<name>` with `lib.mkEnableOption` and wraps config in `lib.mkIf cfg.enable`. Subfolders with a `default.nix` are auto-imported (`utils/importSubmodules.nix`); `users/<user>/` works the same way with home-manager.
 - `modules/services/<name>/`: compose2nix-style `virtualisation.oci-containers` (podman, journald logging). Units are named `podman-<service>-<container>`, grouped under `podman-compose-<service>-root.target`. Secrets come from sops `environmentFiles`.
+- Service folders: tmpfiles only creates `volumeDir` (owned by the user). Each container unit creates the folders it bind-mounts under `volumeDir` in its own `preStart`, parents first, owned by the `<container>_uid`/`_gid` it runs as. Folders are only created when missing, so containers sharing a folder can all list it:
+  ```nix
+  preStart = ''
+    for d in ${joplin_volume_dir} ${joplin_data_dir}; do
+      [ -d "$d" ] || install -d -m 0755 -o ${toString joplin_uid} -g ${toString joplin_gid} "$d"
+    done
+  '';
+  ```
+  Don't add container folders to tmpfiles: it refuses paths owned by another user under `volumeDir` ("unsafe path transition").
 - `modules/services/drive/compose` is a git submodule (upstream opencloud-compose): don't edit it.
 - Commits: Conventional Commits (commitlint in CI), `type(scope): subject` with the module as scope, e.g. `fix(media-server): ...`. Input bumps: `feat(flake)!: update to latest version`.
 - Spelling: British English.
