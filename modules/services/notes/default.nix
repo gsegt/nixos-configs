@@ -35,12 +35,11 @@ in
       "notes/postgres/env" = { };
     };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${joplin_volume_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
-      "d ${joplin_data_dir} 0755 ${toString joplin_uid} ${toString joplin_gid} - -"
-      "d ${postgres_volume_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
-      "d ${postgres_data_dir} 0755 ${toString postgres_uid} ${toString postgres_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -86,6 +85,11 @@ in
       ];
     };
     systemd.services."podman-notes-joplin" = {
+      preStart = ''
+        for d in ${joplin_volume_dir} ${joplin_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString joplin_uid} -g ${toString joplin_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -124,6 +128,11 @@ in
       ];
     };
     systemd.services."podman-notes-postgres" = {
+      preStart = ''
+        for d in ${postgres_volume_dir} ${postgres_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString postgres_uid} -g ${toString postgres_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
