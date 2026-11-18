@@ -135,11 +135,11 @@
     "opencloud-compose": {
       "flake": false,
       "locked": {
-        "lastModified": 1793117922,
-        "narHash": "sha256-wTVXdduvuUG6USGaQ1Zp8f+1rpVgctUTI9ffLSON07M=",
+        "lastModified": 1794933866,
+        "narHash": "sha256-kxXpqupV+0d4lucqlGnQT15aXABwtHOY3pFWRvuqvuw=",
         "owner": "opencloud-eu",
         "repo": "opencloud-compose",
-        "rev": "91911a5883b9e9baf15416a0d62d751c647f1b1b",
+        "rev": "59ca2885f522dd6b24ac18a1897b7c03672620a3",
         "type": "github"
       },
       "original": {
