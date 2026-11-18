@@ -32,10 +32,11 @@ in
       gid = radicale_gid;
     };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
       "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
-      "d ${radicale_volume_dir} 0755 ${toString radicale_uid} ${toString radicale_gid} - -"
-      "d ${radicale_data_dir} 0755 ${toString radicale_uid} ${toString radicale_gid} - -"
     ];
 
     services.${config.modules.services.reverse-proxy.service} = {
@@ -72,6 +73,11 @@ in
       ];
     };
     systemd.services."podman-dav-radicale" = {
+      preStart = ''
+        for d in ${radicale_volume_dir} ${radicale_data_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString radicale_uid} -g ${toString radicale_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
