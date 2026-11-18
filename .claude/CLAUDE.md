@@ -47,6 +47,6 @@ The `nix-verify` skill runs this sequence and reports per host. Flakes only see 
   '';
   ```
   Don't add container folders to tmpfiles: it refuses paths owned by another user under `volumeDir` ("unsafe path transition").
-- `modules/services/drive/compose` is a git submodule (upstream opencloud-compose): don't edit it.
+- `drive` mounts upstream config files from the `opencloud-compose` flake input (`flake = false`, locked in `flake.lock`); bump it with `just update opencloud-compose`.
 - Commits: Conventional Commits (commitlint in CI), `type(scope): subject` with the module as scope, e.g. `fix(media-server): ...`. Input bumps: `feat(flake)!: update to latest version`.
 - Spelling: British English.

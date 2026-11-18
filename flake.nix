@@ -15,6 +15,11 @@
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Not a flake: only the config files the drive module mounts.
+    opencloud-compose = {
+      url = "github:opencloud-eu/opencloud-compose";
+      flake = false;
+    };
     nixpkgs-server.url = "github:NixOS/nixpkgs/nixos-26.05-small";
     home-manager-server = {
       url = "github:nix-community/home-manager/release-26.05";

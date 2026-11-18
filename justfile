@@ -113,13 +113,13 @@ deploy-server:
     #!/usr/bin/env bash
     set -euo pipefail
     # Containers bind-mount config files from the server's own checkout
-    # (e.g. monitoring, dav, drive's submodule, home-assistant), not from the
-    # store, so it must be at the commit being deployed before switching.
+    # (e.g. monitoring, dav, home-assistant), not from the store, so it must
+    # be at the commit being deployed before switching.
     if [[ -n "$(git status --porcelain)" ]]; then
         echo "warning: uncommitted changes are built, but files mounted from the server's checkout will not include them" >&2
     fi
     echo "Pulling /etc/nixos on {{ server }}..." >&2
-    ssh {{ server }} -- git -C /etc/nixos pull --ff-only --recurse-submodules
+    ssh {{ server }} -- git -C /etc/nixos pull --ff-only
     local_head=$(git rev-parse HEAD)
     server_head=$(ssh {{ server }} -- git -C /etc/nixos rev-parse HEAD)
     if [[ "$local_head" != "$server_head" ]]; then

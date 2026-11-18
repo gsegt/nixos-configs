@@ -132,6 +132,22 @@
         "type": "github"
       }
     },
+    "opencloud-compose": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793117922,
+        "narHash": "sha256-wTVXdduvuUG6USGaQ1Zp8f+1rpVgctUTI9ffLSON07M=",
+        "owner": "opencloud-eu",
+        "repo": "opencloud-compose",
+        "rev": "91911a5883b9e9baf15416a0d62d751c647f1b1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "opencloud-eu",
+        "repo": "opencloud-compose",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "claude-code": "claude-code",
@@ -140,6 +156,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
         "nixpkgs-server": "nixpkgs-server",
+        "opencloud-compose": "opencloud-compose",
         "sops-nix": "sops-nix"
       }
     },

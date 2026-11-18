@@ -1,3 +1,0 @@
-[submodule "modules/services/drive/compose"]
-	path = modules/services/drive/compose
-	url = https://github.com/opencloud-eu/opencloud-compose.git

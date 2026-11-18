@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -17,7 +18,16 @@ let
   opencloud_uid = 1000;
   opencloud_gid = 1000;
   opencloud_port = 9200;
-  opencloud_ref_dir = "/etc/nixos/modules/services/drive/compose";
+  # Upstream config files (flake input, in the store so read-only), by
+  # path under config/ => mount point in the opencloud container.
+  opencloud_ref_dir = "${inputs.opencloud-compose}/config";
+  opencloud_ref_mounts = {
+    "euro-office/app-registry.yaml" = "/etc/opencloud/app-registry.yaml";
+    "opencloud/apps" = "/var/lib/opencloud/web/assets/apps";
+    "opencloud/apps.yaml" = "/etc/opencloud/apps.yaml";
+    "opencloud/banned-password-list.txt" = "/etc/opencloud/banned-password-list.txt";
+    "opencloud/csp.yaml" = "/etc/opencloud/csp.yaml";
+  };
   euro_office_port = 9900;
   cfg = config.modules.services.${service};
 in
@@ -31,6 +41,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Fail the build, not the container start, if upstream moves a file.
+    assertions = lib.mapAttrsToList (path: _: {
+      assertion = builtins.pathExists "${opencloud_ref_dir}/${path}";
+      message = "modules.services.${service}: config/${path} is missing from the opencloud-compose input.";
+    }) opencloud_ref_mounts;
+
     sops.secrets = {
       "drive/opencloud/env" = { };
       "drive/euro-office/env" = { };
@@ -162,14 +178,12 @@ in
         config.sops.secrets."drive/opencloud/env".path
       ];
       volumes = [
-        "${opencloud_ref_dir}/config/euro-office/app-registry.yaml:/etc/opencloud/app-registry.yaml:rw"
-        "${opencloud_ref_dir}/config/opencloud/apps:/var/lib/opencloud/web/assets/apps:rw"
-        "${opencloud_ref_dir}/config/opencloud/apps.yaml:/etc/opencloud/apps.yaml:rw"
-        "${opencloud_ref_dir}/config/opencloud/banned-password-list.txt:/etc/opencloud/banned-password-list.txt:rw"
-        "${opencloud_ref_dir}/config/opencloud/csp.yaml:/etc/opencloud/csp.yaml:rw"
         "${opencloud_config_dir}:/etc/opencloud:rw"
         "${opencloud_data_dir}:/var/lib/opencloud:rw"
-      ];
+      ]
+      ++ lib.mapAttrsToList (
+        path: target: "${opencloud_ref_dir}/${path}:${target}:ro"
+      ) opencloud_ref_mounts;
       ports = [
         "127.0.0.1:${toString opencloud_port}:9200/tcp"
       ];
