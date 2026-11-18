@@ -14,9 +14,9 @@ let
   home_assistant_volume_dir = "${cfg.volumeDir}/home-assistant";
   home_assistant_config_dir = "${home_assistant_volume_dir}/config";
   home_assistant_port = 8123;
-  # Pinned so home-assistant/configuration.yaml can trust the reverse proxy,
-  # which reaches the container from this network's gateway. Keep in sync with
-  # trusted_proxies.
+  # Pinned so Home Assistant can trust the reverse proxy, which reaches the
+  # container from this network's gateway. Keep in sync with the trusted
+  # proxies in Settings → System → Network.
   subnet = "10.89.100.0/24";
   cfg = config.modules.services.${service};
 in

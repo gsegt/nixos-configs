@@ -10,13 +10,10 @@ homeassistant:
   # Keep in sync with the domain in default.nix
   external_url: https://home.gsegt.eu
 
-# Behind the reverse proxy: trust X-Forwarded-For from the container network
-# (the proxy reaches the container from its gateway). Keep the subnet in sync
-# with default.nix.
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 10.89.100.0/24
+# No http: block, it is configured in the UI (Settings → System → Network).
+# Behind the reverse proxy it must use X-Forwarded-For and trust the container
+# network, 10.89.100.0/24 (the proxy reaches the container from its gateway);
+# keep it in sync with the subnet in default.nix.
 
 # Written by the UI editors; default.nix creates these files when missing.
 automation: !include automations.yaml

@@ -5,9 +5,9 @@
 # dashboards) lives in the writable /config volume. The plugs' firmware is in
 # esphome/ at the root of the repo.
 #
-# The network subnet is pinned because configuration.yaml trusts it as the
-# proxy: requests from the host-side reverse proxy reach the container from
-# the bridge gateway.
+# The network subnet is pinned because Home Assistant trusts it as the proxy
+# (Settings → System → Network): requests from the host-side reverse proxy
+# reach the container from the bridge gateway.
 
 name: &name home-assistant
 
