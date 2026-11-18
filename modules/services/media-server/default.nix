@@ -71,33 +71,11 @@ in
   config = lib.mkIf cfg.enable {
     sops.secrets."media-server/gluetun/env" = { };
 
+    # Each container unit creates its own folders below (preStart): tmpfiles
+    # refuses to create paths owned by another user under volumeDir, which
+    # the user owns ("unsafe path transition").
     systemd.tmpfiles.rules = [
-      "d ${data_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${media_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${torrents_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${bazarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${bazarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${clonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${clonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${filebrowser_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${filebrowser_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${filebrowser_database_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${gluetun_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${gluetun_gluetun_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${jellyfin_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${jellyfin_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${prowlarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${prowlarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${qbit_manage_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${qbit_manage_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${qbittorrent_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${qbittorrent_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${radarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${radarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${seerr_volume_dir} 0755 ${toString seerr_uid} ${toString seerr_gid} - -"
-      "d ${seerr_config_dir} 0755 ${toString seerr_uid} ${toString seerr_gid} - -"
-      "d ${sonarr_volume_dir} 0755 ${toString uid} ${toString gid} - -"
-      "d ${sonarr_config_dir} 0755 ${toString uid} ${toString gid} - -"
+      "d ${cfg.volumeDir} 0755 ${config.modules.base.userName} ${config.modules.base.groupName} - -"
     ];
 
     networking.firewall.allowedTCPPorts = [
@@ -155,6 +133,11 @@ in
       ];
     };
     systemd.services."podman-media-server-bazarr" = {
+      preStart = ''
+        for d in ${data_dir} ${media_dir} ${bazarr_volume_dir} ${bazarr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -194,6 +177,11 @@ in
       ];
     };
     systemd.services."podman-media-server-clonarr" = {
+      preStart = ''
+        for d in ${clonarr_volume_dir} ${clonarr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -234,6 +222,11 @@ in
       ];
     };
     systemd.services."podman-media-server-filebrowser" = {
+      preStart = ''
+        for d in ${data_dir} ${media_dir} ${filebrowser_volume_dir} ${filebrowser_config_dir} ${filebrowser_database_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -285,6 +278,11 @@ in
       ];
     };
     systemd.services."podman-media-server-gluetun" = {
+      preStart = ''
+        for d in ${gluetun_volume_dir} ${gluetun_gluetun_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -327,6 +325,11 @@ in
       ];
     };
     systemd.services."podman-media-server-jellyfin" = {
+      preStart = ''
+        for d in ${data_dir} ${media_dir} ${jellyfin_volume_dir} ${jellyfin_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -366,6 +369,11 @@ in
       ];
     };
     systemd.services."podman-media-server-prowlarr" = {
+      preStart = ''
+        for d in ${prowlarr_volume_dir} ${prowlarr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -409,6 +417,11 @@ in
       ];
     };
     systemd.services."podman-media-server-qbit-manage" = {
+      preStart = ''
+        for d in ${data_dir} ${torrents_dir} ${qbit_manage_volume_dir} ${qbit_manage_config_dir} ${qbittorrent_volume_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -451,6 +464,11 @@ in
       ];
     };
     systemd.services."podman-media-server-qbittorrent" = {
+      preStart = ''
+        for d in ${data_dir} ${torrents_dir} ${qbittorrent_volume_dir} ${qbittorrent_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -485,6 +503,11 @@ in
       ];
     };
     systemd.services."podman-media-server-radarr" = {
+      preStart = ''
+        for d in ${data_dir} ${radarr_volume_dir} ${radarr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -522,6 +545,11 @@ in
       ];
     };
     systemd.services."podman-media-server-seerr" = {
+      preStart = ''
+        for d in ${seerr_volume_dir} ${seerr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString seerr_uid} -g ${toString seerr_gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
@@ -562,6 +590,11 @@ in
       ];
     };
     systemd.services."podman-media-server-sonarr" = {
+      preStart = ''
+        for d in ${data_dir} ${sonarr_volume_dir} ${sonarr_config_dir}; do
+          [ -d "$d" ] || install -d -m 0755 -o ${toString uid} -g ${toString gid} "$d"
+        done
+      '';
       serviceConfig = {
         Restart = lib.mkOverride 90 "always";
       };
