@@ -17,13 +17,16 @@ let
   exporters = config.services.prometheus.exporters;
   cfg = config.modules.services.${service};
 
-  # Probe every site the reverse proxy serves; read by Prometheus file_sd.
+  # Probe every site the reverse proxy serves, plus the services that add
+  # their own targets; read by Prometheus file_sd.
   blackboxTargets = pkgs.writeText "blackbox-targets.json" (
     builtins.toJSON [
       {
-        targets = map (host: "https://${host}") (
-          lib.optionals config.services.caddy.enable (builtins.attrNames config.services.caddy.virtualHosts)
-        );
+        targets =
+          map (host: "https://${host}") (
+            lib.optionals config.services.caddy.enable (builtins.attrNames config.services.caddy.virtualHosts)
+          )
+          ++ cfg.blackboxTargets;
       }
     ]
   );
@@ -34,6 +37,12 @@ in
 
     volumeDir = lib.mkOption {
       type = lib.types.path;
+    };
+
+    blackboxTargets = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Extra URLs to probe, for services not behind the reverse proxy.";
     };
   };
 
