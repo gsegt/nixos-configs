@@ -1,0 +1,44 @@
+# Syncthing, LAN only: the GUI is at http://192.168.1.253:8384 (set its user
+# and password on first visit), the sync protocol on 22000/tcp+udp.
+#
+# The container uses a bridged network like the other services, so it only
+# sees its own 10.89.x.x address and LAN discovery (21027/udp) cannot work.
+# On each device, set aspire's addresses to
+# `tcp://192.168.1.253:22000, quic://192.168.1.253:22000, dynamic`
+# to connect directly on the LAN instead of through a relay.
+#
+# Synced folders go under /var/syncthing/data (pick the path when adding a
+# folder in the GUI); config and database are in /var/syncthing/config.
+
+x-restart: &restart unless-stopped
+x-pull_policy: &pull_policy always
+
+name: &name file-sync
+
+services:
+  syncthing:
+    container_name: file-sync-syncthing
+    image: docker.io/syncthing/syncthing:latest
+    pull_policy: *pull_policy
+    restart: *restart
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      # Don't create ~/Sync, which would sit outside the mounted volumes
+      STNODEFAULTFOLDER: 1
+    volumes:
+      - /media/external/data-vault/services/file-sync/syncthing/config:/var/syncthing/config
+      - /media/external/data-vault/services/file-sync/syncthing/data:/var/syncthing/data
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+    labels:
+      - io.containers.autoupdate=registry
+
+networks:
+  default:
+    name: *name
+
+# nix run nixpkgs#compose2nix -- -auto_format -write_nix_setup=false -enable_option -inputs modules/services/file-sync/docker-compose.yml -output modules/services/file-sync/default-debug.nix

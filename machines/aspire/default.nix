@@ -54,6 +54,10 @@ in
       volumeDir = "${baseServicesDir}/drive";
     };
     dyndns-ovh.enable = true;
+    file-sync = {
+      enable = true;
+      volumeDir = "${baseServicesDir}/file-sync";
+    };
     home-assistant = {
       enable = true;
       volumeDir = "${baseServicesDir}/home-assistant";
