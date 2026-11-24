@@ -20,6 +20,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # The root filesystem only appears once the disk is unlocked, which can take any amount of
+    # time remotely. Without this, systemd gives up on it after 90s and drops into emergency mode,
+    # where `systemctl default` can no longer resume the boot.
+    fileSystems."/".options = [ "x-systemd.device-timeout=0" ];
+
     boot.initrd = {
       availableKernelModules = cfg.networkKernelModules;
       network = {
