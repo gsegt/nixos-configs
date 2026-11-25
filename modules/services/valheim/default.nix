@@ -68,7 +68,7 @@ in
         "PORT" = "2456";
         "PUID" = "1000";
         "SERVER_NAME" = "harmless-midock";
-        "UPDATE_ON_START" = "false";
+        "UPDATE_ON_START" = "true";
         "WORLD_NAME" = "harmless-midock";
       };
       environmentFiles = [
@@ -127,7 +127,7 @@ in
         "PORT" = "2458";
         "PUID" = "1000";
         "SERVER_NAME" = "overc-loc";
-        "UPDATE_ON_START" = "false";
+        "UPDATE_ON_START" = "true";
         "WORLD_NAME" = "overc-loc";
       };
       environmentFiles = [
